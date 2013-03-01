@@ -1,0 +1,20 @@
+To:管理者 
+
+自動デプロイを実施しましたがすべてのプロジェクトが何らかの原因で失敗状態となりましたので自動デプロイは停止致します。 
+問題がある場合は原因を調査、問題解消後再度実施してください 
+
+===内訳=== 
+【自動デプロイ対象プロジェクト一覧】= ${all.project} 
+├ SVNリポジトリへのコミットがないため最新化対象外 = ${check_update.fail.project} 
+├ ワークスペース最新化での失敗                    = ${svn_update.fail.project} 
+├ クリーンビルド失敗                              = ${clean_build.fail.project} 
+├ アノテーションビルド失敗                        = ${annotation_build.fail.project} 
+├ ビルド失敗                                      = ${build.fail.project} 
+├ アプリケーションコピー失敗                      = ${copy_application.fail.project} 
+├ アンデプロイ失敗                                = ${undeploy.fail.project} 
+├ アプリケーション入替失敗                        = ${rename_application.fail.project} 
+├ デプロイ失敗                                    = ${deploy.fail.project} 
+└ 旧アプリケーション削除失敗                      = ${delete_application.fail.project} 
+
+
+※本メッセージはANTにより自動送信されたメッセージです。 

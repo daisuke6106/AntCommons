@@ -1,0 +1,837 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".">
+	
+	<property name="all_project.target.spacer.start" value="[START]■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
+	<property name="all_project.target.spacer.fin"   value="[FIN]  ■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
+	
+	<!-- Ant拡張タスクの読み込み -->
+	<import file="../../ant_tasks/taskdef.xml"/>
+	
+	<!-- 全プロジェクト プロパティを読み込み -->
+	<property file="./all_project.properties"/> 
+	
+	<!-- IPメッセンジャーを起動 -->
+	<ipmsg user="${ipmsg.username}" nickname="${ipmsg.nickname}" groupname="${ipmsg.groupname}"/>
+	
+	<!-- 各リスト定義 --> 
+	<!-- 全タスク実行対象プロジェクト一覧           -->
+	<list id="alltargetproject"                      />
+	<!-- タスク実行対象プロジェクト一覧             -->
+	<list id="targetproject"                         />
+	<!-- SVNチェックアウト失敗プロジェクト一覧      -->
+	<list id="svn_checkout.fail"                     />
+	<!-- SVN更新無プロジェクト一覧                  -->
+	<list id="check_update.fail"                     />
+	<!-- SVN更新失敗プロジェクト一覧                -->
+	<list id="svn_update.fail"                       />
+	<!-- クリ－ンビルド失敗プロジェクト一覧         -->
+	<list id="clean_build.fail"                      />
+	<!-- アノテーションビルド失敗プロジェクト一覧   -->
+	<list id="annotation_build.fail"                 />
+	<!-- ビルド失敗プロジェクト一覧                 -->
+	<list id="build.fail"                            />
+	<!-- アプリケーションコピー失敗プロジェクト一覧 -->
+	<list id="copy_application.fail"                 />
+	<!-- 最新化対象プロジェクト一覧                 -->
+	<list id="modernization.project"                 />
+	<!-- アンデプロイ失敗プロジェクト一覧           -->
+	<list id="undeploy.fail"                         />
+	<!-- ローカルアンデプロイ失敗プロジェクト一覧   -->
+	<list id="undeploy_local.fail"                   />
+	<!-- アプリケーション入替失敗プロジェクト一覧   -->
+	<list id="rename_application.fail"               />
+	<!-- デプロイ失敗プロジェクト一覧               -->
+	<list id="deploy.fail"                           />
+	<!-- ローカルデプロイ失敗プロジェクト一覧       -->
+	<list id="deploy_local.fail"                     />
+	<!-- 旧アプリケーション削除失敗プロジェクト一覧 -->
+	<list id="delete_application.fail"               />
+	<!-- 再デプロイ失敗プロジェクト一覧             -->
+	<list id="redeploy_local.fail"                   />
+	
+	<!-- 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]初期処理
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]本XMLがあるディレクトリ内から
+		(ﾟ∀ﾟ)       タスク実行対象のプロジェクト（project.xmlを保持するディレクトリ）を検索し、
+		(ﾟ∀ﾟ)       タスク実行対象プロジェクト一覧リストに保持する。
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="init">
+		<!-- project.xmlを保持するディレクトリ一覧をリストに保持する -->
+		<forfile type="d" file="${basedir}">
+			<fileexist type="f" file="./${forfile.name}/project.xml">
+				<true>
+					<listadd id="targetproject" add="${forfile.name}"/>
+				</true>
+			</fileexist>
+		</forfile>
+		<listcopy id="targetproject" newid="alltargetproject"/>
+		
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+	</target>
+	
+	<!-- 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [概要]対象プロジェクト選択処理 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持しているプロジェクトから 
+		(ﾟ∀ﾟ) 処理対象から外すプロジェクト、処理に含めるプロジェクトを対話形式で選択させる。 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+	--> 
+	<target name="choise"> 
+		<echo message="${all_project.target.spacer.start}"/>
+		<listcopy id="targetproject" newid="choiseproject"/> 
+		<echo message="■□■□■□処理対象にするプロジェクトを選択してください。■□■□" /> 
+		<echo message="現在の処理対象プロジェクト=[ ${targetproject.tostring} ]" /> 
+		
+		<listeach id="choiseproject"> 
+			<var name="do.choise.var" unset="true"/> 
+			<input message="　プロジェクト[ ${listeach.str} ] を処理対象にしますか？" validargs="y,n" addproperty="do.choise.var"/> 
+			<if> 
+				<equals arg1="${do.choise.var}" arg2="n" /> 
+				<then> 
+					<listremove id="targetproject" remove="${listeach.str}"/> 
+					<echo message="　　プロジェクト[ ${listeach.str} ] を処理対象プロジェクトから除外しました。"/> 
+				</then> 
+			</if> 
+		</listeach> 
+		<listhaselement id="targetproject"> 
+			<false> 
+				<echo message="全プロジェクトが処理対象から除外されました。" /> 
+				<fail/> 
+			</false> 
+		</listhaselement> 
+		<var name="do.check.var" unset="true"/> 
+		<input message="処理対象プロジェクトは[ ${targetproject.tostring} ]でよろしいですか？" validargs="y,n" addproperty="do.check.var"/> 
+		<if> 
+			<equals arg1="${do.check.var}" arg2="n" /> 
+			<then> 
+				<fail message="出直してきてください(ﾆｯｺﾘ"/> 
+			</then> 
+		</if> 
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target> 
+	
+	<!-- 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [概要]SVNチェックアウト処理 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している 
+		(ﾟ∀ﾟ) プロジェクトをSVNからチェックアウトを実行する。 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+	--> 
+	<target name="svn_checkout"> 
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject"> 
+			<trycatch> 
+				<try> 
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="svn_checkout"/> 
+				</try> 
+				<catch> 
+					<listadd id="svn_checkout.fail" add="${listeach.str}"/> 
+				</catch> 
+			</trycatch> 
+		</listeach> 
+		<listremoveall id="targetproject" removeid="svn_checkout.fail" /> 
+		
+		<echo message="チェックアウト対象プロジェクト=${alltargetproject.tostring}" /> 
+		<echo message="チェックアウト失敗プロジェクト=${svn_checkout.fail.tostring}" /> 
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 --> 
+		<listhaselement id="targetproject"> 
+			<false> 
+				<echo message="全プロジェクトがチェックアウトに失敗しました。" /> 
+			<fail/> 
+			</false> 
+		</listhaselement> 
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]SVN更新チェック処理
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している
+		(ﾟ∀ﾟ)       プロジェクトのリビジョン番号とリポジトリのリビジョン番号を比較し、最新状態かのチェックを行う。
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="check_update">
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject">
+			<trycatch>
+				<try>
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="check_update"/>
+				</try>
+				<catch>
+					<listadd id="check_update.fail" add="${listeach.str}"/>
+				</catch>
+			</trycatch>
+		</listeach>
+		<listremoveall id="targetproject" removeid="check_update.fail" />
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 -->
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]ワークスペース更新
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している
+		(ﾟ∀ﾟ)       プロジェクトをSVNサーバに接続し、SVNリポジトリから最新版をダウンロードする。
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="svn_update">
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject">
+			<trycatch>
+				<try>
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="svn_update"/>
+				</try>
+				<catch>
+					<listadd id="svn_update.fail" add="${listeach.str}"/>
+				</catch>
+			</trycatch>
+		</listeach>
+		<listremoveall id="targetproject" removeid="svn_update.fail" />
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 -->
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]クリーンビルド更新
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している
+		(ﾟ∀ﾟ)       プロジェクトのビルドを実施する。（eclipseのビルドと同等を実施する）
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="clean_build">
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject">
+			<trycatch>
+				<try>
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="clean_build"/>
+				</try>
+				<catch>
+					<listadd id="clean_build.fail" add="${listeach.str}"/>
+				</catch>
+			</trycatch>
+		</listeach>
+		<listremoveall id="targetproject" removeid="clean_build.fail" />
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 -->
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]ワークスペース更新
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している
+		(ﾟ∀ﾟ)       プロジェクトのアノテーションビルドを実施する。（buildAnno.xmlを実施する）
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="annotation_build">
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject">
+			<trycatch>
+				<try>
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="annotation_build"/>
+				</try>
+				<catch>
+					<listadd id="annotation_build.fail" add="${listeach.str}"/>
+				</catch>
+			</trycatch>
+		</listeach>
+		<listremoveall id="targetproject" removeid="annotation_build.fail" />
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 -->
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]ワークスペース更新
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している
+		(ﾟ∀ﾟ)       プロジェクトのビルドを実施する。（build.xmlを実施する）
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="build">
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject">
+			<trycatch>
+				<try>
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="build"/>
+				</try>
+				<catch>
+					<listadd id="build.fail" add="${listeach.str}"/>
+				</catch>
+			</trycatch>
+		</listeach>
+		<listremoveall id="targetproject" removeid="build.fail" />
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 -->
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]アプリケーションコピー実施
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している
+		(ﾟ∀ﾟ)       プロジェクトのビルドを行って生成されたアプリケーションをデプロイサーバへコピーを行う。
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="copy_application">
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject">
+			<trycatch>
+				<try>
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="copy_application"/>
+				</try>
+				<catch>
+					<listadd id="copy_application.fail" add="${listeach.str}"/>
+				</catch>
+			</trycatch>
+		</listeach>
+		<listremoveall id="targetproject" removeid="copy_application.fail" />
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 -->
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]事前通知
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]ユーザ、管理者に指定時間後、サーバが停止する旨のメッセージを送信し、指定時間SLEEP後、停止直前の通知を再度送信する。
+		(ﾟ∀ﾟ)       
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="advancenotice">
+		<echo message="${all_project.target.spacer.start}"/>
+		<!-- 管理者にメッセージを送信する -->
+		<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_server_stop_before}">
+			<property name="sleep.time"                    value="${sleep.minutes}"                 />
+			<property name="target.server"                 value="http://1.1.1.1/"                  />
+			<property name="undeploy.project"              value="${targetproject.tostring}"         />
+			<property name="all.project"                   value="${alltargetproject.tostring}"      />
+			<property name="check_update.fail.project"     value="${check_update.fail.tostring}"     />
+			<property name="svn_update.fail.project"       value="${svn_update.fail.tostring}"       />
+			<property name="clean_build.fail.project"      value="${clean_build.fail.tostring}"      />
+			<property name="annotation_build.fail.project" value="${annotation_build.fail.tostring}" />
+			<property name="build.fail.project"            value="${build.fail.tostring}"            />
+			<property name="copy_application.fail.project" value="${copy_application.fail.tostring}" />
+		</ipmsgsend>
+		<sleep seconds="5"/>
+		<!-- ユーザにメッセージを送信する -->
+		<ipmsgsend tolistfile="${ipmsg.sendlist.user}" msgfile="${ipmsg.message.user_server_stop_before}">
+			<property name="sleep.time"                    value="${sleep.minutes}"                  />
+			<property name="target.server"                 value="http://1.1.1.1/"                   />
+			<property name="undeploy.project"              value="${targetproject.tostring}"         />
+			<property name="all.project"                   value="${alltargetproject.tostring}"      />
+			<property name="check_update.fail.project"     value="${check_update.fail.tostring}"     />
+			<property name="svn_update.fail.project"       value="${svn_update.fail.tostring}"       />
+			<property name="clean_build.fail.project"      value="${clean_build.fail.tostring}"      />
+			<property name="annotation_build.fail.project" value="${annotation_build.fail.tostring}" />
+			<property name="build.fail.project"            value="${build.fail.tostring}"            />
+			<property name="copy_application.fail.project" value="${copy_application.fail.tostring}" />
+		</ipmsgsend>
+		
+		<!-- 指定時間スリープ -->
+		<sleep minutes="${sleep.minutes}"/>
+		
+		<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_server_stop_justbefore}">
+			<property name="target.server"                 value="http://1.1.1.1/"        />
+			<property name="undeploy.project"              value="targetproject.tostring" />
+		</ipmsgsend>
+		<sleep seconds="5"/>
+		<!-- ユーザにメッセージを送信する -->
+		<ipmsgsend tolistfile="${ipmsg.sendlist.user}" msgfile="${ipmsg.message.user_server_stop_justbefore}">
+			<property name="target.server"                 value="http://1.1.1.1/"        />
+			<property name="undeploy.project"              value="targetproject.tostring" />
+		</ipmsgsend>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]アンデプロイ実施
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している
+		(ﾟ∀ﾟ)       プロジェクトをサーバからアンデプロイする。
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="undeploy">
+		<echo message="${all_project.target.spacer.start}"/>
+		<listcopy id="targetproject" newid="modernization.project"/>
+		<listeach id="targetproject">
+			<trycatch>
+				<try>
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="undeploy"/>
+				</try>
+				<catch>
+					<listadd id="undeploy.fail" add="${listeach.str}"/>
+				</catch>
+			</trycatch>
+		</listeach>
+		<listremoveall id="targetproject" removeid="undeploy.fail" />
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 -->
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [概要]アンデプロイ実施（ローカル） 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している 
+		(ﾟ∀ﾟ) プロジェクトをローカルサーバからアンデプロイする。 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+	--> 
+	<target name="undeploy_local"> 
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject"> 
+			<trycatch> 
+				<try> 
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="undeploy_local"/> 
+				</try> 
+				<catch> 
+					<listadd id="undeploy_local.fail" add="${listeach.str}"/> 
+				</catch> 
+			</trycatch> 
+		</listeach> 
+		<listremoveall id="targetproject" removeid="undeploy_local.fail" /> 
+		
+		<echo message="アンデプロイ対象プロジェクト=${alltargetproject.tostring}" /> 
+		<echo message="アンデプロイ失敗プロジェクト=${undeploy_local.fail.tostring}" /> 
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 --> 
+		<listhaselement id="targetproject"> 
+			<false> 
+				<echo message="全プロジェクトがアンデプロイに失敗しました。"/> 
+				<fail/> 
+			</false> 
+		</listhaselement> 
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target> 
+	
+	<!-- 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [概要]再デプロイ実施（ローカル） 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している 
+		(ﾟ∀ﾟ) プロジェクトをローカルサーバへ再デプロイする。 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+	--> 
+	<target name="redeploy_local"> 
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject"> 
+			<trycatch> 
+				<try> 
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="redeploy_local"/> 
+				</try> 
+				<catch> 
+					<listadd id="redeploy_local.fail" add="${listeach.str}"/> 
+				</catch> 
+			</trycatch> 
+		</listeach> 
+		<listremoveall id="targetproject" removeid="redeploy_local.fail" /> 
+		
+		<echo message="再デプロイ対象プロジェクト=${alltargetproject.tostring}" /> 
+		<echo message="再デプロイ失敗プロジェクト=${redeploy_local.fail.tostring}" /> 
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 --> 
+		<listhaselement id="targetproject"> 
+			<false> 
+				<echo message="全プロジェクトが再デプロイに失敗しました。"/> 
+				<fail/> 
+			</false> 
+		</listhaselement> 
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]新旧ファイル入れ替え
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している
+		(ﾟ∀ﾟ)       プロジェクトの現在稼働していた旧アプリケーションと今回ビルドし転送したアプリケーションをリネームし入れ替える。
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="rename_application">
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject">
+			<trycatch>
+				<try>
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="rename_application"/>
+				</try>
+				<catch>
+					<listadd id="rename_application.fail" add="${listeach.str}"/>
+				</catch>
+			</trycatch>
+		</listeach>
+		<listremoveall id="targetproject" removeid="rename_application.fail" />
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 -->
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [概要]デプロイ実施（ローカル） 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している 
+		(ﾟ∀ﾟ) プロジェクトをローカルサーバへデプロイする。 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+	--> 
+	<target name="deploy_local"> 
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject"> 
+			<trycatch> 
+				<try> 
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="deploy_local"/> 
+				</try> 
+				<catch> 
+					<listadd id="deploy_local.fail" add="${listeach.str}"/> 
+				</catch> 
+			</trycatch> 
+		</listeach> 
+		<listremoveall id="targetproject" removeid="deploy_local.fail" /> 
+		
+		<echo message="デプロイ対象プロジェクト=${alltargetproject.tostring}" /> 
+		<echo message="デプロイ失敗プロジェクト=${deploy_local.fail.tostring}" /> 
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 --> 
+		<listhaselement id="targetproject"> 
+			<false> 
+				<echo message="全プロジェクトがデプロイに失敗しました。"/> 
+				<fail/> 
+			</false> 
+		</listhaselement> 
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target> 
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]デプロイ実施
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している
+		(ﾟ∀ﾟ)       プロジェクトの今回ビルドし転送したアプリケーションをサーバへデプロイする。
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="deploy">
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject">
+			<trycatch>
+				<try>
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="deploy"/>
+				</try>
+				<catch>
+					<listadd id="deploy.fail" add="${listeach.str}"/>
+				</catch>
+			</trycatch>
+		</listeach>
+		<listremoveall id="targetproject" removeid="deploy.fail" />
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 -->
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]完了通知
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]ユーザ、管理者にサーバが最新化したことを通知する。
+		(ﾟ∀ﾟ)       
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="completionnotice">
+		<echo message="${all_project.target.spacer.start}"/>
+		<!-- 管理者にメッセージを送信する -->
+		<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_server_stop_before}">
+			<property name="target.server"                   value="http://1.1.1.1/"                     />
+			<property name="deploy.success.project"          value="${targetproject.tostring}"           />
+			<property name="deploy.project"                  value="${modernization.project.tostring}"   />
+			<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           />
+			<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" />
+			<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             />
+		</ipmsgsend>
+		<sleep seconds="5"/>
+		<!-- ユーザにメッセージを送信する -->
+		<ipmsgsend tolistfile="${ipmsg.sendlist.user}" msgfile="${ipmsg.message.user_server_stop_before}">
+			<property name="target.server"                   value="http://1.1.1.1/"                     />
+			<property name="deploy.success.project"          value="${targetproject.tostring}"           />
+			<property name="deploy.project"                  value="${modernization.project.tostring}"   />
+			<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           />
+			<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" />
+			<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             />
+		</ipmsgsend>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+	
+	
+	<!--
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) [概要]旧アプリケーション削除
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している
+		(ﾟ∀ﾟ)       プロジェクトの旧アプリケーションを削除する。
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ  )━(   )━(  ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)
+	-->
+	<target name="delete_application">
+		<echo message="${all_project.target.spacer.start}"/>
+		<listeach id="targetproject">
+			<trycatch>
+				<try>
+					<ant dir="${basedir}/${listeach.str}" antfile="project.xml" target="delete_application"/>
+				</try>
+				<catch>
+					<listadd id="delete_application.fail" add="${listeach.str}"/>
+				</catch>
+			</trycatch>
+		</listeach>
+		<listremoveall id="targetproject" removeid="delete_application.fail" />
+		
+		<!-- 実行対象プロジェクトがない場合、<fail/>を発生し停止 -->
+		<listhaselement id="targetproject">
+			<false>
+				<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.admin_all_fail}"> 
+					<property name="all.project"                     value="${alltargetproject.tostring}"        /> 
+					<property name="check_update.fail.project"       value="${check_update.fail.tostring}"       /> 
+					<property name="svn_update.fail.project"         value="${svn_update.fail.tostring}"         /> 
+					<property name="clean_build.fail.project"        value="${clean_build.fail.tostring}"        /> 
+					<property name="annotation_build.fail.project"   value="${annotation_build.fail.tostring}"   /> 
+					<property name="build.fail.project"              value="${build.fail.tostring}"              /> 
+					<property name="copy_application.fail.project"   value="${copy_application.fail.tostring}"   /> 
+					<property name="undeploy.fail.project"           value="${undeploy.fail.tostring}"           /> 
+					<property name="rename_application.fail.project" value="${rename_application.fail.tostring}" /> 
+					<property name="deploy.fail.project"             value="${deploy.fail.tostring}"             /> 
+					<property name="delete_application.fail.project" value="${delete_application.fail.tostring}" /> 
+				</ipmsgsend> 
+				<fail/> 
+			</false>
+		</listhaselement>
+		<echo message="${all_project.target.spacer.fin}"/>
+	</target>
+</project>

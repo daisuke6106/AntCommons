@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="ant_tasks/ant-dklib/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="ant_tasks/ant-dklib/lib/ant.jar"/>
+	<classpathentry kind="lib" path="ant_tasks/ant-dklib/lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="ant_tasks/ant-dklib/lib/commons-configuration-1.6.jar"/>
+	<classpathentry kind="lib" path="ant_tasks/ant-dklib/lib/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="ant_tasks/ant-dklib/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="ant_tasks/ant-dklib/lib/ipmsg.jar"/>
+	<classpathentry kind="output" path="ant_tasks/ant-dklib/classes"/>
+</classpath>

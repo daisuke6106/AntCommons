@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<property name="commmon_project.target.spacer.start" value="[START]=========================================================================================================="/>
+	<property name="commmon_project.target.spacer.fin"   value="[FIN]  =========================================================================================================="/>
+	
+	<import file="../../ant_tasks/taskdef.xml"/>
+	
+	<!--================================================-->
+	<!-- 初期化 -->
+	  <!--================================================-->
+	  <target name="init">
+	  	<path id="_init.path.id">
+	  	  <fileset dir="${library.dir}" includes="*.jar"/>
+	  	</path>
+	  	<path id="_init.path.id.test">
+	  	  <fileset dir="${library.dir}" includes="*.jar"/>
+	  	  <fileset dir="${test.library.dir}" includes="*.jar"/>
+	  	</path>
+	  	<pathconvert property="_library.jars" refid="_init.path.id"/>
+	  	<pathconvert property="_test.library.jars" refid="_init.path.id.test"/>
+	  </target>
+	  
+	<!--================================================-->
+	  <!-- コンパイル -->
+	  <!--================================================-->
+	  <target name="compile" depends="init">
+	  	<delete dir="${compile.delete.dir}" />
+	  	<mkdir dir="${compile.mkdir.dir}" />
+	    <javac srcdir      = "${compile.javac.srcdir}"
+	           destdir     = "${compile.javac.destdir}"
+	           deprecation = "${compile.javac.deprecation}"
+	           debug       = "${compile.javac.debug}"
+	           encoding    = "${compile.javac.encoding}"
+	           classpath   = "${compile.javac.classpath};${_library.jars}"
+	           includeantruntime="false"/>
+	  	<copy todir="${compile.copy.todir}">
+	  	  <fileset dir="${compile.copy.fileset.dir}">
+	  	  	<include name="${compile.copy.fileset.include.name}"/>
+	  	    <exclude name="${compile.copy.fileset.exclude.name}"/>
+	   	  </fileset>
+	   	</copy>
+	  </target>
+
+	 <!--================================================-->
+	  <!-- テスト用クラスコンパイル -->
+	  <!--================================================-->
+	  <target name="test_compile" depends="init">
+	  	<delete dir="${test_compile.delete.dir}" />
+	  	<mkdir dir="${test_compile.mkdir.dir}" />
+	    <javac srcdir      = "${test_compile.javac.srcdir}"
+	           destdir     = "${test_compile.javac.destdir}"
+	           deprecation = "${test_compile.javac.deprecation}"
+	           debug       = "${test_compile.javac.debug}"
+	           encoding    = "${test_compile.javac.encoding}"
+	           classpath   = "${test_compile.javac.classpath};${_test.library.jars}"
+	           includeantruntime="false"
+	           />
+	  	<copy todir="${test_compile.copy.todir}">
+	  		<fileset dir="${test_compile.copy.fileset.dir}">
+	  		  <include name="${test_compile.copy.fileset.include.name}"/>
+	  		  <exclude name="${test_compile.copy.fileset.exclude.name}"/>
+	  		</fileset>
+	  	</copy>
+	  </target>
+	
+	 <!--================================================-->
+	  <!-- JARを作成 -->
+	  <!--================================================-->
+	  <target name="jar" depends="compile">
+	  	<delete dir="${jar.delete.dir}" />
+	  	<jar jarfile  = "${jar.jar.jarfile}"
+	         basedir  = "${jar.jar.basedir}" >
+	  		<zipgroupfileset dir="${library.dir}" includes="*.jar"/>
+	  	</jar>
+	  </target>
+	  
+	  <!--================================================-->
+	  <!-- テスト用JARを作成 -->
+	  <!--================================================-->
+	  <target name="test_jar" depends="test_compile">
+	  	<delete dir="${test_jar.delete.dir}" />
+	  	<jar jarfile  = "${test_jar.jar.jarfile}"
+	         basedir  = "${test_jar.jar.basedir}" >
+	  		<zipgroupfileset dir="${library.dir}" includes="*.jar"/>
+	  		<zipgroupfileset dir="${test.library.dir}" includes="*.jar"/>
+	  	</jar>
+	  </target>
+	  
+	  <!--================================================-->
+	  <!-- javadocを生成 -->
+	  <!--================================================-->
+	  <target name="doc" depends="init">
+	  	<delete dir="${doc.delete.dir}"/>
+	    <mkdir  dir="${doc.mkdir.dir}" />
+	    <javadoc locale       = "${doc.jacadoc.locale}"
+	             charset      = "${doc.jacadoc.charset}"
+	             encoding     = "${doc.jacadoc.encoding}"
+	             docencoding  = "${doc.jacadoc.docencoding}"
+	             sourcepath   = "${doc.jacadoc.sourcepath}"
+	             packagenames = "${doc.jacadoc.packagenames}"
+	             destdir      = "${doc.jacadoc.destdir}">
+	    	<classpath>
+	    		<pathelement path="${_library.jars}"/>
+	    		<pathelement path="${_test.library.jars}"/>
+	    	</classpath>
+	    </javadoc>
+	  </target>
+
+	  <!--================================================-->
+	  <!-- FindBugs実行 -->
+	  <!--================================================-->
+	  <target name="findbugs.execute" depends="init">
+	  	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${_library.jars}"/>
+	  	<findbugs home="${_test.library.jars}" output="xml" outputFile="bcel-fb.xml">
+	  		<auxClassPath path="${_test.library.jars}"/>
+	  		<sourcePath path="scr"/>
+	  		<class location="./message.jar"/>
+	  		<class location="${_test.library.jars}"/>
+	  	</findbugs>
+	  </target>
+	  
+	  <!--================================================-->
+	  <!-- カバレッジ出力 -->
+	  <!--================================================-->
+	  <target name="coverege.execute">
+	    
+	  </target>
+	  
+	  <!--================================================-->
+	  <!-- ビルド用フォルダを削除 -->
+	  <!--================================================-->
+	  <target name="clean" depends="init">
+	    <delete dir="${clean.delete.dir}" />
+	  </target>
+
+	  <!--================================================-->
+	  <!-- テストを実行 -->
+	  <!--================================================-->
+	  <target name="test_execute" depends="init">
+	  	<junit fork="${test_execute.junit.fork}" haltonfailure="${test_execute.junit.haltonfailure}">
+		    <test name="jp.co.dk.message.test.TestCaseMessage" />
+	        <formatter type="plain" usefile="false" />
+		  	<classpath>
+		  	  <pathelement path="${_test.library.jars}" />
+		  	  <pathelement path="${test_execute.junit.classpath.pathelement.location.test_jar}" />
+		  	  <pathelement path="${test_execute.junit.classpath.pathelement.location.jar}" />
+	        </classpath>
+		  </junit>
+	  </target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] リポジトリ最新化確認
+		■■     
+		■■     [説明] リポジトリが最新化されているか確認する
+		■■            リポジトリに更新がない場合は<fail/>を発生させる
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="check_update">
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<ant dir="${ant_function.svn.home}" antfile="${ant_function.svn.file}" target="checkupdate" inheritAll="false">
+			<property name="svn.userid"           value="${svn.userid}"/>
+			<property name="svn.password"         value="${svn.password}"/>
+			<property name="svn.checkupdate.path" value="${project.home}"/>
+		</ant>
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] リポジトリチェックアウト実施
+		■■     
+		■■     [説明] 指定のURLのSVNリポジトリからチェックアウトを実行する
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="svn_checkout">
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<ant dir="${ant_function.svn.home}" antfile="${ant_function.svn.file}" target="checkout" inheritAll="false">
+			<property name="svn.userid"            value="${svn.userid}"/>
+			<property name="svn.password"          value="${svn.password}"/>
+			<property name="svn.checkout.url"      value="${svn.url}"/>
+			<property name="svn.checkout.destpath" value="${project.home}"/>
+			<property name="svn.checkout.revision" value="${svn.revision}"/>
+		</ant>
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] ワークスペース更新
+		■■     
+		■■     [説明] 指定のワークスペースにSVNリポジトリから最新版をダウンロードします。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="svn_update">
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<ant dir="${ant_function.svn.home}" antfile="${ant_function.svn.file}" target="update" inheritAll="false">
+			<property name="svn.userid"           value="${svn.userid}"/>
+			<property name="svn.password"         value="${svn.password}"/>
+			<property name="svn.update.dir"       value="${project.home}"/>
+			<property name="svn.update.revision"  value="${svn.revision}"/>
+		</ant>
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] クリーンビルド実施
+		■■     
+		■■     [説明] クリーンビルドを実行する空のタスクです。import先のXMLにて同じtarget名のクリーンビルドタスクを記述することで
+		■■            本タスクをオーバーライドすることが可能です。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="clean_build">
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<echo message="[clean_build] プロジェクト=${project.name} クリーンビルドは定義されていません。"/>
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] アノテーションビルド実施
+		■■     
+		■■     [説明] アノテーションビルドを実行する空のタスクです。import先のXMLにて同じtarget名のクリーンビルドタスクを記述することで
+		■■            本タスクをオーバーライドすることが可能です。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="annotation_build">
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<echo message="[annotation_build] プロジェクト=${project.name} アノテーションビルドは定義されていません。"/>
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] ビルド実施
+		■■     
+		■■     [説明] ビルドを実行する空のタスクです。import先のXMLにて同じtarget名のクリーンビルドタスクを記述することで
+		■■            本タスクをオーバーライドすることが可能です。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="build">
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<echo message="[build] プロジェクト=${project.name} ビルドは定義されていません。"/>
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] アプリケーションコピー
+		■■     
+		■■     [説明] 外部サーバへビルドが完了したアプリケーションディレクトリをコピーする
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="copy_application"> 
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<!-- すでにあった場合、削除 --> 
+		<fileexist type="d" file="${project.release.path.to}/${project.relese.prefix.new}"> 
+			<true> 
+				<delete dir="${project.release.path.to}/${project.relese.prefix.new}"/> 
+			</true> 
+		</fileexist> 
+		<copy todir="${project.release.path.to}/${project.relese.prefix.new}"> 
+			<fileset dir="${project.release.path.from}"/> 
+		</copy> 
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] サーバアンデプロイ実行
+		■■     
+		■■     [説明] サーバへのアンデプロイを実行する
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="undeploy">
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<ant dir="${ant_function.weblogic.home}" antfile="${ant_function.weblogic.file}" target="undeploy" inheritAll="false">
+			<property name="weblogic.home"          value="${weblogic.home}"/>
+			<property name="weblogic.adminurl"      value="${weblogic.addless}"/>
+			<property name="weblogic.user"          value="${weblogic.user}"/>
+			<property name="weblogic.pass"          value="${weblogic.pass}"/>
+			<property name="weblogic.targets"       value="${weblogic.targetserver}"/>
+			<property name="weblogic.undeploy.name" value="${project.name}"/>
+		</ant>
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] サーバアンデプロイ実行（ローカル）
+		■■     
+		■■     [説明] 指定プロジェクトをローカルサーバへのアンデプロイを実行する
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="undeploy_local">
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<ant dir="${ant_function.weblogic.home}" antfile="${ant_function.weblogic.file}" target="undeploy" inheritAll="false">
+			<property name="weblogic.home"          value="${weblogic.home}"/>
+			<property name="weblogic.adminurl"      value="${weblogic.addless.local}"/>
+			<property name="weblogic.user"          value="${weblogic.user.local}"/>
+			<property name="weblogic.pass"          value="${weblogic.pass.local}"/>
+			<property name="weblogic.targets"       value="${weblogic.targetserver.local}"/>
+			<property name="weblogic.undeploy.name" value="${project.name}"/>
+		</ant>
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] 外部サーバ新アプロケーションディレクトリリネーム
+		■■     
+		■■     [説明] 外部サーバにて新しいアプロケーションディレクトリのリネームを行う。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="rename_application"> 
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<!-- 旧アプリケーションをリネームする --> 
+		<!-- すでにあった場合、削除 --> 
+		<fileexist type="d" file="${project.release.path.to}/${project.relese.prefix.old}"> 
+			<true> 
+				<delete dir="${project.release.path.to}/${project.relese.prefix.old}"/> 
+			</true> 
+		</fileexist> 
+		<move todir="${project.release.path.to}/${project.relese.prefix.old}"> 
+			<fileset dir="${project.release.path.to}/${project.name}"/> 
+		</move> 
+
+		<!-- 新アプリケーションをリネームする --> 
+		<!-- すでにあった場合、削除 --> 
+		<fileexist type="d" file="${project.release.path.to}/${project.name}"> 
+			<true> 
+				<delete dir="${project.release.path.to}/${project.name}"/> 
+			</true> 
+		</fileexist> 
+		<move todir="${project.release.path.to}/${project.name}"> 
+			<fileset dir="${project.release.path.to}/${project.relese.prefix.new}"/> 
+		</move> 
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target> 
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] サーバデプロイ実行
+		■■     
+		■■     [説明] サーバへのデプロイを実行する
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="deploy"> 
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<ant dir="${ant_function.weblogic.home}" antfile="${ant_function.weblogic.file}" target="deploy" inheritAll="false"> 
+			<property name="weblogic.home"          value="${weblogic.home}"/> 
+			<property name="weblogic.adminurl"      value="${weblogic.addless}"/> 
+			<property name="weblogic.user"          value="${weblogic.user}"/> 
+			<property name="weblogic.pass"          value="${weblogic.pass}"/> 
+			<property name="weblogic.targets"       value="${weblogic.targetserver}"/> 
+			<property name="weblogic.deploy.name"   value="${project.name}"/> 
+			<property name="weblogic.deploy.source" value="${project.release.path.to}/${project.name}"/> 
+		</ant> 
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target> 
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] サーバデプロイ実行（ローカル）
+		■■     
+		■■     [説明] サーバへのデプロイを実行する
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="deploy_local">
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<ant dir="${ant_function.weblogic.home}" antfile="${ant_function.weblogic.file}" target="deploy" inheritAll="false">
+			<property name="weblogic.home"          value="${weblogic.home}"/>
+			<property name="weblogic.adminurl"      value="${weblogic.addless.local}"/>
+			<property name="weblogic.user"          value="${weblogic.user.local}"/>
+			<property name="weblogic.pass"          value="${weblogic.pass.local}"/>
+			<property name="weblogic.targets"       value="${weblogic.targetserver.local}"/>
+			<property name="weblogic.deploy.name"   value="${project.name}"/>
+			<property name="weblogic.deploy.source" value="${project.deploy.path}"/>
+		</ant>
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] 外部サーバ旧アプロケーションディレクトリ削除
+		■■     
+		■■     [説明] 外部サーバにて古いアプロケーションディレクトリの削除を行う。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="delete_application">
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<delete dir="${project.release.path.to}/${project.relese.prefix.old}"/>
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+		■■ 
+		■■ [概要] サーバ再デプロイ実行（ローカル） 
+		■■ 
+		■■ [説明] 指定プロジェクトをローカルサーバへの再デプロイを実行する 
+		■■ 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+	--> 
+	<target name="redeploy_local"> 
+		<echo message="${commmon_project.target.spacer.start}"/>
+		<ant dir="${ant_function.weblogic.home}" antfile="${ant_function.weblogic.file}" target="redeploy" inheritAll="false"> 
+			<property name="weblogic.home"          value="${weblogic.home}"/> 
+			<property name="weblogic.adminurl"      value="${weblogic.addless.local}"/> 
+			<property name="weblogic.user"          value="${weblogic.user.local}"/> 
+			<property name="weblogic.pass"          value="${weblogic.pass.local}"/> 
+			<property name="weblogic.targets"       value="${weblogic.targetserver.local}"/> 
+			<property name="weblogic.redeploy.name" value="${project.name}"/> 
+		</ant> 
+		<echo message="${commmon_project.target.spacer.fin}"/>
+	</target> 
+</project>

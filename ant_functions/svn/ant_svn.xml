@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Subversion プロジェクト
+    Svn タスクを使用した Subversion の操作を行います。
+    
+    使用例：
+        
+        本Antを単体で使用する場合
+              ant -f ant_svn.xml [ターゲット]
+              
+            ・更新する場合
+              ant -f ant_svn.xml update -propertyfile ./project_env.properties
+              
+            ・リビジョン番号を取得する場合
+              ant -f ant_svn.xml info -propertyfile ./project_env.properties
+              
+            ・チェックアウトする場合
+              ant -f ant_svn.xml checkout -propertyfile ./project_env.properties
+        
+        本Antを別のAntから呼び出す場合
+            <ant antfile="svn/ant_svn.xml" target="update">
+                プロジェクト必須プロパティ
+                <property file="project/weblogic.property"/>
+                タスク必須プロパティ
+                <property file="project/project.property"/>
+            </ant>
+-->
+<project name="svn" basedir=".">
+    
+    <!-- 共通タスク定義 -->
+    <import file="../../ant_tasks/taskdef.xml"/>
+    
+    <!-- SVNモジュールの読み込み -->
+    <path id="svnant.class.path">
+        <fileset dir="./svnant-1.2.1/lib">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+    
+    <!-- SVNタスク定義 -->
+    <typedef resource="org/tigris/subversion/svnant/svnantlib.xml"
+                     classpathref="svnant.class.path"/>
+    
+    <property name="svn.target.spacer.start" value="[START]----------------------------------------------------------------------------------------------------------"/>
+    <property name="svn.target.spacer.fin"   value="[FIN]  ----------------------------------------------------------------------------------------------------------"/>
+    
+    <!-- ===========================================================================================
+         チェックアウト
+         リポジトリ全体 または リポジトリ内のファイルを、ローカルへダウンロードします。
+         
+         タスク必須プロパティ
+         svn.userid            = SVNアカウントのユーザ名
+         svn.password          = SVNアカウントのパスワード
+         svn.checkout.url      = チェックアウト対象のリポジトリのURL
+         svn.checkout.destpath = チェックアウト先
+         svn.checkout.revision = SVNのリビジョン
+                                 例：HEAD
+    ============================================================================================ -->
+    <target name="checkout">
+        <echo message="${svn.target.spacer.start}"/>
+        <echo message="svn.userid=${svn.userid}"/>
+        <echo message="svn.password=${svn.password}"/>
+        <echo message="svn.checkout.url=${svn.checkout.url}"/>
+        <echo message="svn.checkout.destpath=${svn.checkout.destpath}"/>
+        <echo message="svn.checkout.revision=${svn.checkout.revision}"/>
+        <fileexist type="d" file="${svn.checkout.destpath}"> 
+            <true> 
+                <input message="【WARNING】すでにチェックアウト先のディレクトリが存在します。[チェックアウト先ディレクトリ=${svn.checkout.destpath}] 削除してチェックアウトを行ってよろしいですか?" validargs="y,n" addproperty="do.delete"/> 
+                <if> 
+                    <equals arg1="${do.delete}" arg2="y" /> 
+                    <then> 
+                        <delete dir="${svn.checkout.destpath}" /> 
+                        <mkdir dir="${svn.checkout.destpath}" /> 
+                    </then> 
+                    <else> 
+                        <fail message="チェックアウトを中止しました。"/> 
+                    </else> 
+                </if> 
+            </true> 
+        </fileexist>
+        <svn username="${svn.userid}" password="${svn.password}">
+            <checkout url="${svn.checkout.url}" revision="${svn.checkout.revision}" destPath="${svn.checkout.destpath}" />
+        </svn>
+        <echo message="${svn.target.spacer.fin}"/>
+    </target>
+    
+    <!-- ===========================================================================================
+        情報取得
+        
+        指定のURLのSVNリポジトリから情報を取得し、Antプロパティに値を設定します。
+        
+        注意
+        Antタスクから呼び出した場合、呼び出された側で設定されたプロパティは呼び出し側で参照することができません。
+        そのため、本タスクをAntタスクから呼び出す場合、antfetchタスクを使用することを推奨します。
+        antfetchを使用することで呼び出し側でプロパティを取得することが可能になります。
+        
+        例：
+        
+        <antfetch dir="ant_svn.xml" target="info" inheritAll="false" return="
+             svn.info.path,
+             svn.info.url,
+             svn.info.repouuid,
+             svn.info.rev,
+             svn.info.nodekind,
+             svn.info.schedule,
+             svn.info.author,
+             svn.info.lastRev,
+             svn.info.lastDate,
+             svn.info.name,
+             svn.info.lastTextUpdate,
+             svn.info.lastPropUpdate,
+             svn.info.checksum
+        ">
+            <property name="svn.userid" value="${svn.userid}"/>
+            <property name="svn.password" value="${svn.password}"/>
+            <property name="svn.info.url" value="${workspace.info.url}"/>
+            <property name="svn.info.propprefix" value="svn.info."/>
+        </antfetch>
+        
+        <echo message="${svn.info.rev}">
+        
+        プロパティ設定先
+            path    パス
+            url    URL
+            repouuid    ???
+            rev    リビジョン番号
+            nodekind    端末種別
+            schedule    ???
+            author    更新者名
+            lastRev    最終リビジョン番号
+            lastDate    最終更新日
+            name    名前(ファイルのみ)
+            lastTextUpdate    最終更新日(ファイルのみ)
+            lastPropUpdate    ???(ファイルのみ)
+            checksum    ???(ファイルのみ)
+            
+        タスク必須プロパティ
+            svn.userid          = SVNアカウントのユーザ名
+            svn.password        = SVNアカウントのパスワード
+            svn.info.target     = 情報収集対象のSVNリポジトリURL
+            svn.info.propprefix = 接続子、取得内容のプロパティ名の先頭に記載されます。
+                                  svn.prefix=test.とした場合、test.pathで取得することができます。
+            
+    ============================================================================================ -->
+    <target name="info">
+        <echo message="${svn.target.spacer.start}"/>
+        <echo message="svn.userid=${svn.userid}"/>
+        <echo message="svn.password=${svn.password}"/>
+        <echo message="svn.info.target=${svn.info.target}"/>
+        <echo message="svn.info.propprefix=${svn.info.propprefix}"/>
+        <svn username="${svn.userid}" password="${svn.password}">
+            <info target="${svn.info.target}" propprefix="${svn.info.propprefix}" />
+        </svn>
+        <echo message="${svn.target.spacer.fin}"/>
+    </target>
+    
+    <!-- ===========================================================================================
+        情報取得
+        
+        ファイル、ディレクトリからSVN情報を取得し、Antプロパティに値を設定します。
+        
+        注意
+        Antタスクから呼び出した場合、呼び出された側で設定されたプロパティは呼び出し側で参照することができません。
+        そのため、本タスクをAntタスクから呼び出す場合、antfetchタスクを使用することを推奨します。
+        antcallbackを使用することで呼び出し側でプロパティを取得することが可能になります。
+        
+        例：
+        
+        <antcallback dir="ant_svn.xml" target="wcversion" inheritAll="false" return="
+             workspace.info.repository.url,
+             workspace.info.repository.path,
+             workspace.info.revision.max,
+             workspace.info.revision.max-with-flags,
+             workspace.info.revision.range,
+             workspace.info.committed.max,
+             workspace.info.committed.max-with-flags,
+             workspace.info.modified,
+             workspace.info.mixed
+        ">
+            <property name="svn.userid" value="${svn.userid}"/>
+            <property name="svn.password" value="${svn.password}"/>
+            <property name="svn.wcversion.path" value="${svn.checkupdate.dir}"/>
+            <property name="svn.wcversion.prefix" value="workspace.info."/>
+        </antcallback>
+        
+        <echo message="workspace.info.repository.url"/>
+        
+        プロパティ設定先
+            repository.url    リポジトリのURL
+            repository.path    リポジトリ中のパス
+            revision.max    リビジョン番号(最大値)
+            revision.max-with-flags    リビジョン番号
+            revision.range    端末種別
+            committed.max    ???
+            committed.max-with-flags    更新者名
+            modified    最終リビジョン番号
+            mixed    最終更新日
+            
+        タスク必須プロパティ
+            svn.userid             = SVNアカウントのユーザ名
+            svn.password           = SVNアカウントのパスワード
+            svn.wcversion.path     = 情報収集対象のディレクトリまたはファイル
+            svn.wcversion.prefix   = 接続子、取得内容のプロパティ名の先頭に記載されます。
+                                     svn.prefix=test.とした場合、test.pathで取得することができます。
+            
+    ============================================================================================ -->
+    <target name="wcversion">
+        <echo message="${svn.target.spacer.start}"/>
+        <echo message="svn.userid=${svn.userid}"/>
+        <echo message="svn.password=${svn.password}"/>
+        <echo message="svn.wcversion.path=${svn.wcversion.path}"/>
+        <echo message="svn.wcversion.prefix=${svn.wcversion.prefix}"/>
+        <svn username="${svn.userid}" password="${svn.password}">
+            <wcversion path="${svn.wcversion.path}" propprefix="${svn.wcversion.prefix}" />
+        </svn>
+        <echo message="${svn.target.spacer.fin}"/>
+    </target>
+    
+    <!-- ===========================================================================================
+         更新
+         
+         SVNリポジトリにある変更を作業コピーに反映します
+         
+         タスク必須プロパティ
+         svn.userid            = SVNアカウントのユーザ名
+         svn.password          = SVNアカウントのパスワード
+         svn.update.dir        = 更新対象ワークスペース
+         svn.update.revision   = SVNのリビジョン(HEAD、BASE、COMMITTEDまたはPREV) 例：HEAD
+    ============================================================================================ -->
+    <target name="update">
+        <echo message="${svn.target.spacer.start}"/>
+        <echo message="svn.userid=${svn.userid}"/>
+        <echo message="svn.password=${svn.password}"/>
+        <echo message="svn.update.dir=${svn.update.dir}"/>
+        <echo message="svn.update.revision=${svn.update.revision}"/>
+        <svn username="${svn.userid}" password="${svn.password}">
+            <update dir="${svn.update.dir}" revision="${svn.update.revision}" recurse="true" />
+        </svn>
+        <echo message="${svn.target.spacer.fin}"/>
+    </target>
+    
+    <!-- ===========================================================================================
+         更新チェック
+         
+         ワークスペースのリビジョン番号とSVNリポジトリのリビジョン番号を比較し
+         更新されていない場合は正常に終了します。
+         更新されている場合は例外を生成します。
+         
+         タスク必須プロパティ
+         svn.userid           = SVNアカウントのユーザ名
+         svn.password         = SVNアカウントのパスワード
+         svn.checkupdate.path = チェック対象ワークスペース
+    ============================================================================================ -->
+    <target name="checkupdate">
+        <echo message="${svn.target.spacer.start}"/>
+        <echo message="svn.userid=${svn.userid}"/>
+        <echo message="svn.password=${svn.password}"/>
+        <echo message="svn.checkupdate.path=${svn.checkupdate.path}"/>
+        <!-- WORKSPACEリポジトリ情報取得 -->
+        <svn username="${svn.userid}" password="${svn.password}">
+            <wcversion path="${svn.checkupdate.path}" prefix="workspace.info." />
+        </svn>
+        
+        <!-- SVNリポジトリ情報取得 -->
+        <svn username="${svn.userid}" password="${svn.password}">
+            <info target="${workspace.info.repository.url}" propprefix="svn.info." />
+        </svn>
+        
+        <if>
+            <!-- 更新されていなかった場合 -->
+            <equals arg1="${svn.info.lastRev}" arg2="${workspace.info.revision.max}" />
+            <then>
+                <echo message="There is no update. target.path=${svn.checkupdate.path} svn.last.revision=${svn.info.lastRev} workspace.last.revision=${workspace.info.revision.max}"/>
+                <fail/>
+            </then>
+            <!-- 更新されていた場合、正常終了 -->
+            <else>
+                <echo message="There is update. Processing is continued. target.path=${svn.checkupdate.path} svn.last.revision=${svn.info.lastRev} workspace.last.revision=${workspace.info.revision.max}"/>
+            </else>
+        </if>
+        <echo message="${svn.target.spacer.fin}"/>
+    </target>
+    
+</project>

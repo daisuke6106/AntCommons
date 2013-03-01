@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="taskdef">
+	<script language="javascript">
+		<![CDATA[
+			importClass(java.io.File);
+			dir  = project.getProperty("ant.file.taskdef");
+			file = new File(dir);
+			path = file.getParent();
+			project.setProperty("common.home", path);
+		]]>
+	</script>
+	
+	<!-- Ant-Contlibのタスク定義 -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${common.home}/ant-contrib/ant-contrib-1.0b3.jar"/>
+		</classpath>
+	</taskdef>
+	
+	<!-- Ant-dklibのタスク定義 -->
+	<taskdef resource="jp/co/dk/anttask/antlib.xml">
+		<classpath>
+			<pathelement location="${common.home}/ant-dklib/classes"/>
+			<pathelement location="${common.home}/ant-dklib/lib/commons-collections-3.2.1.jar"/>
+			<pathelement location="${common.home}/ant-dklib/lib/commons-configuration-1.6.jar"/>
+			<pathelement location="${common.home}/ant-dklib/lib/commons-lang-2.6.jar"/>
+			<pathelement location="${common.home}/ant-dklib/lib/commons-logging-1.1.1.jar"/>
+			<pathelement location="${common.home}/ant-dklib/lib/ipmsg.jar"/>
+		</classpath>
+	</taskdef>
+</project>

@@ -1,0 +1,186 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+
+<!--
+    Ant Weblogic Server コンフィグレーションプロジェクト
+    Ant タスクを使用した WebLogic Server ドメインのコンフィグレーションを行います。
+    
+    使用例：
+        
+        本Antを単体で使用する場合
+              ant -f ant_weblogic.xml [ターゲット]
+              
+            ・デプロイする場合
+              ant -f ant_weblogic.xml deploy -propertyfile ./project_env.properties
+              
+            ・アンデプロイする場合
+              ant -f ant_weblogic.xml undeploy -propertyfile ./project_env.properties
+              
+            ・再デプロイする場合
+              ant -f ant_weblogic.xml redeploy -propertyfile ./project_env.properties
+        
+        本Antを別のAntから呼び出す場合
+            <ant antfile="weblogic/ant_weblogic.xml" target="deploy">
+                Weblogic必須プロパティ
+                <property file="project/weblogic.property"/>
+                タスク必須プロパティ
+                <property file="project/project.property"/>
+            </ant>
+            
+  -->
+
+<project name="weblogic" >
+    
+    <property name="weblogic.target.spacer.start" value="[START]----------------------------------------------------------------------------------------------------------"/>
+    <property name="weblogic.target.spacer.fin"   value="[FIN]  ----------------------------------------------------------------------------------------------------------"/>
+    
+    <taskdef name="wldeploy"
+        classname="weblogic.ant.taskdefs.management.WLDeploy"
+        classpath="${weblogic.home}/server/lib/weblogic.jar" />
+        
+    <taskdef name="wlconfig" 
+        classname="weblogic.ant.taskdefs.management.WLConfig" 
+        classpath="${weblogic.home}/server/lib/weblogic.jar" />
+    
+    <taskdef name="wlserver" 
+        classname="weblogic.ant.taskdefs.management.WLServer"
+        classpath="${weblogic.home}/server/lib/weblogic.jar" 
+        />
+        
+    <!-- ===========================================================================================
+        Weblogic デプロイ
+        
+        指定のweblogicサーバへデプロイを行う。
+        
+        タスク必須プロパティ
+            weblogic.home          = WebLogicがインストールされているディレクトリへのパス
+                                     例：C:/bea/weblogic92
+            weblogic.adminurl      = WebLogic操作対象URL
+                                     例：t3://localhost:7001
+            weblogic.user          = 管理者アカウントのユーザ名
+            weblogic.pass          = 管理者アカウントのパスワード
+            weblogic.targets       = 操作対象サーバ名称
+                                     [確認方法]Weblogicコンソールにログインし、[環境]→[サーバ]に記載されている名称
+                                     [複数選択可]例:aaa,bbb
+            weblogic.deploy.name   = デプロイメント名称
+            weblogic.deploy.source = デプロイ対象デイレクトリ、またはファイル
+    ============================================================================================ -->
+    <target name="deploy">
+        <echo message="${weblogic.target.spacer.start}"/>
+        <echo message="weblogic.home=${weblogic.home}"/>
+        <echo message="weblogic.adminurl=${weblogic.adminurl}"/>
+        <echo message="weblogic.user=${weblogic.user}"/>
+        <echo message="weblogic.pass=${weblogic.pass}"/>
+        <echo message="weblogic.targets=${weblogic.targets}"/>
+        <echo message="weblogic.deploy.name=${weblogic.deploy.name}"/>
+        <echo message="weblogic.deploy.source=${weblogic.deploy.source}"/>
+        <wldeploy action="deploy"
+            user="${weblogic.user}" password="${weblogic.pass}"
+            adminurl="${weblogic.adminurl}" targets="${weblogic.targets}" name="${weblogic.deploy.name}" source="${weblogic.deploy.source}" 
+            verbose="true" nowait="no"
+        />
+        <echo message="${weblogic.target.spacer.fin}"/>
+    </target>
+    
+    <!-- ===========================================================================================
+        Weblogic 再デプロイ
+        
+        指定のweblogicサーバへ再デプロイを行う。
+        
+        タスク必須プロパティ
+            weblogic.home          = WebLogicがインストールされているディレクトリへのパス
+                                     例：C:/bea/weblogic92
+            weblogic.adminurl      = WebLogic操作対象URL
+                                     例：t3://localhost:7001
+            weblogic.user          = 管理者アカウントのユーザ名
+            weblogic.pass          = 管理者アカウントのパスワード
+            weblogic.targets       = 操作対象サーバ名称
+                                     [確認方法]Weblogicコンソールにログインし、[環境]→[サーバ]に記載されている名称
+                                     [複数選択可]例:aaa,bbb
+            weblogic.redeploy.name = デプロイメント名称
+    ============================================================================================ -->
+    <target name="redeploy">
+        <echo message="${weblogic.target.spacer.start}"/>
+        <echo message="weblogic.home=${weblogic.home}"/>
+        <echo message="weblogic.adminurl=${weblogic.adminurl}"/>
+        <echo message="weblogic.user=${weblogic.user}"/>
+        <echo message="weblogic.pass=${weblogic.pass}"/>
+        <echo message="weblogic.targets=${weblogic.targets}"/>
+        <echo message="weblogic.redeploy.name=${weblogic.redeploy.name}"/>
+        <wldeploy action="redeploy"
+            user="${weblogic.user}" password="${weblogic.pass}" 
+            adminurl="${weblogic.adminurl}" targets="${weblogic.targets}"
+            name="${weblogic.redeploy.name}"
+        />
+        <echo message="${weblogic.target.spacer.fin}"/>
+    </target>
+    
+    <!-- ===========================================================================================
+        Weblogic アンデプロイ
+        
+        指定のweblogicサーバへアンデプロイを行う。
+        
+        タスク必須プロパティ
+            weblogic.home          = WebLogicがインストールされているディレクトリへのパス
+                                     例：C:/bea/weblogic92
+            weblogic.adminurl      = WebLogic操作対象URL
+                                     例：t3://localhost:7001
+            weblogic.user          = 管理者アカウントのユーザ名
+            weblogic.pass          = 管理者アカウントのパスワード
+            weblogic.targets       = 操作対象サーバ名称
+                                     [確認方法]Weblogicコンソールにログインし、[環境]→[サーバ]に記載されている名称
+                                     [複数選択可]例:aaa,bbb
+            weblogic.undeploy.name=アンデプロイメント名称
+    ============================================================================================ -->
+    <target name="undeploy">
+        <echo message="${weblogic.target.spacer.start}"/>
+        <echo message="weblogic.home=${weblogic.home}"/>
+        <echo message="weblogic.adminurl=${weblogic.adminurl}"/>
+        <echo message="weblogic.user=${weblogic.user}"/>
+        <echo message="weblogic.pass=${weblogic.pass}"/>
+        <echo message="weblogic.targets=${weblogic.targets}"/>
+        <echo message="weblogic.undeploy.name=${weblogic.undeploy.name}"/>
+        <wldeploy action="undeploy"
+            user="${weblogic.user}" password="${weblogic.pass}" 
+            adminurl="${weblogic.adminurl}" targets="${weblogic.targets}"
+            name="${weblogic.undeploy.name}"
+        />
+        <echo message="${weblogic.target.spacer.fin}"/>
+    </target>
+    
+    <!-- ===========================================================================================
+        ■ 作成中 φ(・＿・;）
+        
+        任意パラメータ系はどうするか？
+        
+        案
+        antcontlib使ってifタスクで切り分けするかな？
+        (これを使うとantcontlibに依存関係ができてしまう。他の手を考え中)
+        
+        Weblogic データソース追加
+        プロパティファイルに指定された値を元にWeblogicにデータソースの追加を行う
+        
+        必須パラメータ
+            
+        任意パラメータ
+            
+    ============================================================================================ -->
+    <target name="datasource_add">
+        <wlconfig url="t3://localhost:7001" username="weblogic" password="weblogic">
+            <create>
+                <!-- 初期容量：この接続プールの作成時に作成する物理接続の数 -->
+                <set attribute="InitialCapacity" value="1"/>
+                <!-- 最大容量：この接続プールが保有できる物理接続の最大数 -->
+                <set attribute="MaxCapacity" value="15"/>
+                <set attribute="RefreshMinutes" value="0"/>
+                <set attribute="ShrinkPeriodMinutes" value="15"/>
+                <set attribute="ShrinkingEnabled" value="true"/>
+                <set attribute="TestConnectionsOnRelease" value="false"/>
+                <set attribute="TestConnectionsOnReserve" value="false"/>
+                <set attribute="URL" value="jdbc:mysql://localhost/test"/>
+                <set attribute="Targets" value="${testserver}"/>
+                
+            </create>
+        </wlconfig>
+    </target>
+    
+</project>
