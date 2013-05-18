@@ -32,7 +32,7 @@
     
     <!-- SVNモジュールの読み込み -->
     <path id="svnant.class.path">
-        <fileset dir="./svnant-1.2.1/lib">
+        <fileset dir="./svnant-1.3.1/lib">
             <include name="*.jar" />
         </fileset>
     </path>
@@ -281,4 +281,47 @@
         <echo message="${svn.target.spacer.fin}"/>
     </target>
     
+	<!-- ===========================================================================================
+	         ダンプファイル取得
+	         
+	         指定されたSVNリポジトリを指定のディレクトリへダンプファイルとして取得します。
+	         指定されたリポジトリが存在しない、ダンプファイル取得に失敗した場合、例外を送出します。
+	         
+	         ※svnantのライブラリではダンプファイル実行はサポートしていないため、antからのsvnadminコマンド実行でのダンプファイル取得処理になります。
+	         そのため、本antタスク実行対象のマシン上にsvnadminが使用できる環境であることが前提となります。
+
+	         タスク必須プロパティ
+	         svn.userid    = SVNアカウントのユーザ名
+	         svn.password  = SVNアカウントのパスワード
+	         svn.dump.target.path     = ダンプ取得対象リポジトリへのパス
+	         svn.dump.output.path     = ダンプファイル保存先
+	         svn.dump.output.filename = ダンプファイル名
+	    ============================================================================================ -->
+	    <target name="dump">
+	        <echo message="${svn.target.spacer.start}"/>
+	        <echo message="svn.userid=${svn.userid}"/>
+	        <echo message="svn.password=${svn.password}"/>
+	        <echo message="svn.dump.target.path=${svn.dump.target.path}"/>
+	    	<echo message="svn.dump.output.path=${svn.dump.output.path}"/>
+	        
+	        <exec exectable="svnadmin" resultproperty="svn.dump.svnadmin.returncode">
+	        	<arg value="dump"/>
+	        	<arg value="${svn.dump.target.path}>${svn.dump.output.path}"/>
+	        </exec>
+	    	<if>
+	            <equals arg1="${svn.dump.svnadmin.returncode}" arg2="0" />
+	    		<!-- リターンコードが０は正常終了 -->
+	            <then>
+	                <echo message="I failed to create a svn dump file. target.path=${svn.dump.target.path} svn.dump.output.path=${svn.dump.output.path}"/>
+	                <fail/>
+	            </then>
+	            <!-- リターンコードが０以外は異常終了 -->
+	            <else>
+	            	<echo message="I failed to create a svn dump file. target.path=${svn.dump.target.path} svn.dump.output.path=${svn.dump.output.path}"/>
+	            	<fail/>
+	            </else>
+	        </if>
+	        <echo message="${svn.target.spacer.fin}"/>
+	    </target>
+	    
 </project>
