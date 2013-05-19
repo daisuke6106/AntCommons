@@ -3,6 +3,7 @@
 	<taskdef name="fileexist" classname="jp.co.dk.anttask.file.FileExist"/>
 	<taskdef name="forfile" classname="jp.co.dk.anttask.file.ForFile"/>
     <taskdef name="ipmsg" classname="jp.co.dk.anttask.ipmsg.IpMessenger"/>
+    <taskdef name="ipmsgsend" classname="jp.co.dk.anttask.ipmsg.IpMessenger"/>
     <taskdef name="list" classname="jp.co.dk.anttask.list.List"/>
     <taskdef name="listadd" classname="jp.co.dk.anttask.list.ListAdd"/>
     <taskdef name="listcontains" classname="jp.co.dk.anttask.list.ListContains"/>
