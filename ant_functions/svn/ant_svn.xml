@@ -304,21 +304,26 @@
 	        <echo message="svn.dump.target.path=${svn.dump.target.path}"/>
 	    	<echo message="svn.dump.output.path=${svn.dump.output.path}"/>
 	        
-	        <exec exectable="svnadmin" resultproperty="svn.dump.svnadmin.returncode">
-	        	<arg value="dump"/>
-	        	<arg value="${svn.dump.target.path}>${svn.dump.output.path}"/>
-	        </exec>
+	    	<trycatch>
+				<try>
+					<exec executable="svnadmin" resultproperty="svn.dump.svnadmin.returncode">
+			        	<arg value="dump"/>
+			        	<arg value="${svn.dump.target.path}>${svn.dump.output.path}/${svn.dump.output.filename}"/>
+			        </exec>
+				</try>
+				<catch>
+				</catch>
+			</trycatch>
+	        
 	    	<if>
 	            <equals arg1="${svn.dump.svnadmin.returncode}" arg2="0" />
 	    		<!-- リターンコードが０は正常終了 -->
 	            <then>
-	                <echo message="I failed to create a svn dump file. target.path=${svn.dump.target.path} svn.dump.output.path=${svn.dump.output.path}"/>
-	                <fail/>
+	                <echo message="dumpfile create is success."/>
 	            </then>
 	            <!-- リターンコードが０以外は異常終了 -->
 	            <else>
-	            	<echo message="I failed to create a svn dump file. target.path=${svn.dump.target.path} svn.dump.output.path=${svn.dump.output.path}"/>
-	            	<fail/>
+	            	<fail message="I failed to create a svn dump file. target.path=${svn.dump.target.path} svn.dump.output.path=${svn.dump.output.path}"/>
 	            </else>
 	        </if>
 	        <echo message="${svn.target.spacer.fin}"/>
