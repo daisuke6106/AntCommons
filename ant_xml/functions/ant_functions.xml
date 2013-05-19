@@ -11,7 +11,7 @@
 	<property file="./ant_functions.properties"/> 
 	
 	<!-- IPメッセンジャーを起動 -->
-	<ipmsg user="${ipmsg.username}" groupname="${ipmsg.groupname}"/>
+<!-- 	<ipmsg user="${ipmsg.username}" groupname="${ipmsg.groupname}"/> -->
 	
 	<!-- 
 			(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
@@ -24,9 +24,14 @@
 			(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
 		--> 
 	<target name="svn_dump">
-		<property name="svn.dump.target.path"     value="a"/>
-		<property name="svn.dump.output.path"     value="b"/>
-		<property name="svn.dump.output.filename" value="c"/>
-		<ant antfile="../../ant_functions/svn/ant_svn.xml" target="dump"/>
+		<trycatch>
+			<try>
+				<ant antfile="../../ant_functions/svn/ant_svn.xml" target="dump"/>
+			</try>
+			<catch>
+			    <ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.svn_dump_fail.message}"/>
+			</catch>
+		</trycatch>
+		<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.svn_dump_success.message}"/>
 	</target>
 </project>
