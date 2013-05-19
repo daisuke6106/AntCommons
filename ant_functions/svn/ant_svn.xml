@@ -26,13 +26,22 @@
             </ant>
 -->
 <project name="svn" basedir=".">
-    
     <!-- 共通タスク定義 -->
     <import file="../../ant_tasks/taskdef.xml"/>
     
+	<script language="javascript">
+		<![CDATA[
+			importClass(java.io.File);
+			dir  = project.getProperty("ant.file.svn");
+			file = new File(dir);
+			path = file.getParent();
+			project.setProperty("ant_svn.xml.dir", path);
+		]]>
+	</script>
+	
     <!-- SVNモジュールの読み込み -->
     <path id="svnant.class.path">
-        <fileset dir="./svnant-1.3.1/lib">
+        <fileset dir="${ant_svn.xml.dir}/svnant-1.2.1/lib">
             <include name="*.jar" />
         </fileset>
     </path>
