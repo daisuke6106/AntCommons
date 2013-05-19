@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".">
+	
+	<property name="all_project.target.spacer.start" value="[START]■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
+	<property name="all_project.target.spacer.fin"   value="[FIN]  ■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
+	
+	<!-- Ant拡張タスクの読み込み -->
+	<import file="../../ant_tasks/taskdef.xml"/>
+	
+	<!-- 全プロジェクト プロパティを読み込み -->
+	<property file="./ant_functions.properties"/> 
+	
+	<!-- IPメッセンジャーを起動 -->
+	<ipmsg user="${ipmsg.username}" groupname="${ipmsg.groupname}"/>
+	
+	<!-- 
+			(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+			(ﾟ∀ﾟ) 
+			(ﾟ∀ﾟ) [概要]デプロイ実施（ローカル） 
+			(ﾟ∀ﾟ) 
+			(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している 
+			(ﾟ∀ﾟ) プロジェクトをローカルサーバへデプロイする。 
+			(ﾟ∀ﾟ) 
+			(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+		--> 
+	<target name="svn_dump">
+		<property name="svn.dump.target.path"     value="a"/>
+		<property name="svn.dump.output.path"     value="b"/>
+		<property name="svn.dump.output.filename" value="c"/>
+		<ant antfile="../../ant_functions/svn/ant_svn.xml" target="dump"/>
+	</target>
+</project>
