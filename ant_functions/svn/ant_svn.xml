@@ -300,25 +300,21 @@
 	         そのため、本antタスク実行対象のマシン上にsvnadminが使用できる環境であることが前提となります。
 
 	         タスク必須プロパティ
-	         svn.userid    = SVNアカウントのユーザ名
-	         svn.password  = SVNアカウントのパスワード
 	         svn.dump.target.path     = ダンプ取得対象リポジトリへのパス
 	         svn.dump.output.path     = ダンプファイル保存先
 	         svn.dump.output.filename = ダンプファイル名
 	    ============================================================================================ -->
 	    <target name="dump">
 	        <echo message="${svn.target.spacer.start}"/>
-	        <echo message="svn.userid=${svn.userid}"/>
-	        <echo message="svn.password=${svn.password}"/>
 	        <echo message="svn.dump.target.path=${svn.dump.target.path}"/>
 	    	<echo message="svn.dump.output.path=${svn.dump.output.path}"/>
+	        <echo message="svn.dump.output.filename=${svn.dump.output.filename}"/>
 	        
 	    	<trycatch>
 				<try>
-					<exec executable="svnadmin" resultproperty="svn.dump.svnadmin.returncode">
-			        	<arg value="dump"/>
-			        	<arg value="${svn.dump.target.path}>${svn.dump.output.path}/${svn.dump.output.filename}"/>
-			        </exec>
+					<exec executable="svnadmin" resultproperty="svn.dump.svnadmin.returncode" output="${svn.dump.output.path}/${svn.dump.output.filename}">
+						<arg line="dump ${svn.dump.target.path}"/>
+					</exec>
 				</try>
 				<catch>
 				</catch>
