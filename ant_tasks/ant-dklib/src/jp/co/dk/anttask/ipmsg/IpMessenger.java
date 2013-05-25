@@ -165,6 +165,9 @@ public class IpMessenger extends Task {
 	/** メッセージ本文Bean */
 	private MsgBean msg = new MsgBean();
 	
+	/** IPメッセンジャーインスタンス */
+	private static IPMessanger ipmsg;
+	
 	/**
 	 * IPユーザ名を設定する
 	 * @param userName IPユーザ名
@@ -177,7 +180,7 @@ public class IpMessenger extends Task {
 	 * IPニックネームを設定する
 	 * @param nicName IPニックネーム
 	 */
-	public void setNicName(String nicName) {
+	public void setNickName(String nicName) {
 		this.nicName = nicName;
 	}
 	
@@ -264,15 +267,23 @@ public class IpMessenger extends Task {
 		//メッセージ本文を取得する
 		String messageStr = this.msg.getMsg();
 		
-		IPMessanger messenger;
+		if (ipmsg == null) {
+			try {
+				if (this.userName == null  || this.userName.equals("")) throw new BuildException("IP Messanger start fail. username is non");
+				if (this.nicName == null   || this.nicName.equals("")) throw new BuildException("IP Messanger start fail. nicName is non");
+				if (this.groupName == null || this.groupName.equals("")) throw new BuildException("IP Messanger start fail. groupName is non");
+				ipmsg = new IPMessanger(this.userName, this.nicName, this.groupName, false);
+			} catch (IOException e) {
+				StringBuilder sb = new StringBuilder("IP Messanger start fail. ");
+				throw new BuildException(sb.toString(), e);
+			}
+		}
+		if (msg == null || msg.equals("")) throw new BuildException("Message is not set.");; 
 		try {
-			messenger = new IPMessanger(this.userName, this.nicName, this.groupName, false);
-			
 			// メッセージ本文を送信する
 			for (String ip : toList) {
-				messenger.sendMsg(ip, messageStr, false);
+				ipmsg.sendMsg(ip, messageStr, false);
 			}
-		
 		// 送信に失敗した場合
 		} catch (IOException e) {
 			StringBuilder sb = new StringBuilder("It failed in the message sending. ");
@@ -346,6 +357,10 @@ public class IpMessenger extends Task {
 		 */
 		public void openMsg(String arg0, String arg1) {
 			
+		}
+		
+		public void sendMsg(String host, String msg, boolean secret) throws IOException{
+			super.sendMsg(host, msg, secret);
 		}
 	}
 }
