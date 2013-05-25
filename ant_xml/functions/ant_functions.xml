@@ -1,37 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir=".">
+<project name="ant_functions" basedir=".">
 	
-	<property name="all_project.target.spacer.start" value="[START]■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
-	<property name="all_project.target.spacer.fin"   value="[FIN]  ■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
+	<property name="all_function.target.spacer.start" value="[START]■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
+	<property name="all_function.target.spacer.fin"   value="[FIN]  ■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
 	
 	<!-- Ant拡張タスクの読み込み -->
 	<import file="../../ant_tasks/taskdef.xml"/>
 	
-	<!-- 全プロジェクト プロパティを読み込み -->
+	<!-- ant関数 プロパティを読み込み -->
 	<property file="./ant_functions.properties"/> 
 	
-	<!-- IPメッセンジャーを起動 -->
-<!-- 	<ipmsg user="${ipmsg.username}" groupname="${ipmsg.groupname}"/> -->
-	
 	<!-- 
-			(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
-			(ﾟ∀ﾟ) 
-			(ﾟ∀ﾟ) [概要]デプロイ実施（ローカル） 
-			(ﾟ∀ﾟ) 
-			(ﾟ∀ﾟ) [説明]タスク実行対象プロジェクト一覧に保持している 
-			(ﾟ∀ﾟ) プロジェクトをローカルサーバへデプロイする。 
-			(ﾟ∀ﾟ) 
-			(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
-		--> 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [概要]
+		(ﾟ∀ﾟ) SVNダンプバックアップ取得 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [説明]
+		(ﾟ∀ﾟ) 指定のディレクトリに存在するリポジトリを指定のダンプファイルへ保存します。 
+		(ﾟ∀ﾟ) ダンプファイル名はファイル名には実行した時点の日付（YYYYMMDD）、時間（HHMMSS）が付加されます。
+		(ﾟ∀ﾟ)
+		(ﾟ∀ﾟ) 成功・失敗した際にはIPメッセンジャーで通知される。 
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [例]
+		(ﾟ∀ﾟ) ant_functions.svn_dump.output.path    ="/home/example"
+		(ﾟ∀ﾟ) ant_functions.svn_dump.output.filename="svn_dump"
+		(ﾟ∀ﾟ) にて実行した場合、
+		(ﾟ∀ﾟ) /home/example/svn_dump_20130101_123456.dmp
+		(ﾟ∀ﾟ) のように作成される。
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ) [タスク必須プロパティ]
+        (ﾟ∀ﾟ)  ant_functions.svn_dump.target.path     = ダンプ取得対象リポジトリへのパス
+        (ﾟ∀ﾟ)  ant_functions.svn_dump.output.path     = ダンプファイル保存先
+        (ﾟ∀ﾟ)  ant_functions.svn_dump.output.filename = ダンプファイル名
+		(ﾟ∀ﾟ) 
+		(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ)━(∀ﾟ )━(ﾟ )━( )━( ﾟ)━( ﾟ∀)━(ﾟ∀ﾟ) 
+	--> 
 	<target name="svn_dump">
+	    <echo message="${all_function.target.spacer.start}"/>
+	    <echo message="ant_functions.svn_dump.target.path=${ant_functions.svn_dump.target.path}"/>
+    	<echo message="ant_functions.svn_dump.output.path=${ant_functions.svn_dump.output.path}"/>
+        <echo message="ant_functions.svn_dump.output.filename=${ant_functions.svn_dump.output.filename}"/>
+        
+        <property name="svn.dump.target.path"     value="${ant_functions.svn_dump.target.path}"/>
+        <property name="svn.dump.output.path"     value="${ant_functions.svn_dump.output.path}"/>
+        <property name="svn.dump.output.filename" value="${ant_functions.svn_dump.output.filename}_${date}_${time}.dmp"/>
+        
+        <!-- IPメッセンジャーを起動 -->
+		<ipmsg user="${ipmsg.username}" nickname="${ipmsg.nickname}" groupname="${ipmsg.groupname}"/>
+		
 		<trycatch>
 			<try>
 				<ant antfile="../../ant_functions/svn/ant_svn.xml" target="dump"/>
+				<ipmsgsend tolistfile="${ant_functions.svn_dump.ipmsg.sendlist.admin}" msgfile="${ant_functions.svn_dump.ipmsg.message.svn_dump_success.message}"/>
 			</try>
 			<catch>
-			    <ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.svn_dump_fail.message}"/>
+			    <ipmsgsend tolistfile="${ant_functions.svn_dump.ipmsg.sendlist.admin}" msgfile="${ant_functions.svn_dump.ipmsg.message.svn_dump_fail.message}"/>
+			    <fail message="dump task is fail."/>
 			</catch>
 		</trycatch>
-		<ipmsgsend tolistfile="${ipmsg.sendlist.admin}" msgfile="${ipmsg.message.svn_dump_success.message}"/>
+		<echo message="${all_function.target.spacer.fin}"/>
 	</target>
 </project>
