@@ -10,6 +10,11 @@
 		]]>
 	</script>
 	
+	<tstamp>
+		<format property="date" pattern="yyyyMMdd" unit="hour"/>
+		<format property="time" pattern="HHmmss" unit="hour"/>
+ 	</tstamp>
+ 		
 	<!-- Ant-Contlibのタスク定義 -->
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
