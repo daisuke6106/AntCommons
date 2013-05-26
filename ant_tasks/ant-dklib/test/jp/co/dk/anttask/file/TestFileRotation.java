@@ -78,5 +78,95 @@ public class TestFileRotation extends TestCaseTemplate {
 			fail(e);
 		}
 	}
+	
+	@Test
+	public void setDay() {
+		FileRotation fileRotation = new FileRotation();
+		
+		// nullが設定された場合、例外が送出されること。
+		try {
+			fileRotation.setDay(null);
+		} catch (BuildException e) {
+			assertEquals(e.getMessage(), "day is not set.");
+		}
+		
+		// 空文字が設定された場合、例外が送出されること。
+		try {
+			fileRotation.setDay("");
+		} catch (BuildException e) {
+			assertEquals(e.getMessage(), "day is not set.");
+		}
+		
+		// 数値以外が設定された場合、例外が送出されること。
+		try {
+			fileRotation.setDay("test");
+		} catch (BuildException e) {
+			assertEquals(e.getMessage(), "day is not number.[test]");
+		}
+		
+		// 0が設定された場合、例外を送出すること
+		try {
+			fileRotation.setDay("0");
+		} catch (BuildException e) {
+			assertEquals(e.getMessage(), "Less than 1 is set to date.");
+		}
+		// マイナス値が設定された場合、例外を送出すること
+		try {
+			fileRotation.setDay("-1");
+		} catch (BuildException e) {
+			assertEquals(e.getMessage(), "Less than 1 is set to date.");
+		}
+		// 数値が設定された場合、正常に値が設定されること。
+		try {
+			fileRotation.setDay("1");
+			assertEquals(fileRotation.day , 1);
+		} catch (BuildException e) {
+			fail(e);
+		}
+		
+	}
 
+	@Test
+	public void execite() {
+		// dirが設定されていない場合、例外を送出すること。
+		try {
+			FileRotation fileRotation = new FileRotation();
+			fileRotation.execute();
+			fail();
+		}catch (BuildException e) {
+			assertEquals(e.getMessage(), "dir is not set.");
+		}
+		
+		// filenameが設定されていない場合、例外を送出すること。
+		try {
+			FileRotation fileRotation = new FileRotation();
+			fileRotation.setDir(super.getTestTmpDir().getAbsolutePath());
+			fileRotation.execute();
+			fail();
+		}catch (BuildException e) {
+			assertEquals(e.getMessage(), "filename is not set.");
+		}
+		
+		// dayが設定されていない場合、例外を送出すること。
+		try {
+			FileRotation fileRotation = new FileRotation();
+			fileRotation.setDir(super.getTestTmpDir().getAbsolutePath());
+			fileRotation.setFileName("test");
+			fileRotation.execute();
+			fail();
+		}catch (BuildException e) {
+			assertEquals(e.getMessage(), "day is not set.");
+		}
+		
+		// 指定のディレクトリにファイルが存在しない場合、正常に処理が狩猟するこ。
+		try {
+			FileRotation fileRotation = new FileRotation();
+			fileRotation.setDir(super.getTestTmpDir().getAbsolutePath());
+			fileRotation.setFileName("test");
+			fileRotation.setDay("7");
+			fileRotation.execute();
+		}catch (BuildException e) {
+			fail(e);
+		}
+	}
 }

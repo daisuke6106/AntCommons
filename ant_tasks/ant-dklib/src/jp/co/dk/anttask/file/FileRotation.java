@@ -1,5 +1,7 @@
 package jp.co.dk.anttask.file;
 
+import java.util.Date;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
@@ -77,6 +79,9 @@ public class FileRotation  extends Task {
 	/** ファイル名 */
 	protected String filename;
 	
+	/** 日付 */
+	protected int day = -1;
+	
 	/**
 	 * ファイルローテーション対象のディレクトリを設定する。<p/>
 	 * 指定のパスが存在しない、またはパスがディレクトリをさしていなかった場合、例外を送出する。
@@ -109,4 +114,38 @@ public class FileRotation  extends Task {
 		this.filename = filename;
 	}
 	
+	/**
+	 * ファイルローテーション対象の日付を設定する。<p/>
+	 * 指定していなかった、またはパスがディレクトリをさしていなかった場合、例外を送出する。
+	 * 
+	 * @param dir ローテーション対象ディレクトリ
+	 * @throws BuildException パスが不正な場合
+	 */
+	public void setDay(String day) {
+		if (day == null || day.equals("")) throw new BuildException("day is not set.");
+		try {
+			this.day = Integer.parseInt(day);
+		} catch (NumberFormatException e) {
+			throw new BuildException("day is not number.[" + day + "]");
+		}
+		if (this.day < 1) throw new BuildException("Less than 1 is set to date.");
+	}
+	
+	@Override
+	public void execute() {
+		if (this.dir      == null) throw new BuildException("dir is not set.");
+		if (this.filename == null) throw new BuildException("filename is not set.");
+		if (this.day < 0) throw new BuildException("day is not set.");
+		java.io.File[] fileList = this.dir.listFiles();
+		if (fileList == null || fileList.length == 0) return;
+		for (java.io.File file : fileList) {
+			if (file.getName().indexOf(this.filename) != -1) {
+				file.lastModified();
+			}
+		}
+	}
+	
+	private Date calculationDate(Date date, int dayCount) {
+		return null;
+	}
 }
