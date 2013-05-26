@@ -70,12 +70,29 @@ import org.apache.tools.ant.Task;
  */
 public class FileRotation  extends Task {
 	
+	/** ディレクトリ */
+	private java.io.File dir;
+	
 	/**
-	 * ログローテーション対象のディレクトリを設定する。
+	 * ログローテーション対象のディレクトリを設定する。<p/>
+	 * 指定のパスが存在しない、またはパスがディレクトリをさしていなかった場合、例外を送出する。
 	 * 
 	 * @param dir ローテーション対象ディレクトリ
+	 * @throws BuildException パスが不正な場合
 	 */
 	public void setDir(String dir) {
-		if (dir == null || dir.equals("")) throw new BuildException("target dir is not set."); 
+		if (dir == null || dir.equals("")) throw new BuildException("target dir is not set.");
+		this.dir = new java.io.File(dir);
+		if (!(this.dir.exists())) {
+			StringBuilder sb = new StringBuilder("dir is not exist.[").append(dir).append("]");
+			throw new BuildException(sb.toString());
+		}
+		if (! (this.dir.isDirectory())) {
+			StringBuilder sb = new StringBuilder("dir is not directory.[").append(dir).append("]");
+			throw new BuildException(sb.toString());
+		}
+		
 	}
+	
+	
 }

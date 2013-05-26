@@ -10,5 +10,7 @@
 	<classpathentry kind="lib" path="ant_tasks/ant-dklib/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="ant_tasks/ant-dklib/lib/ipmsg.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="ant_tasks/ant-dklib/lib/test/jmockit.jar"/>
+	<classpathentry kind="lib" path="ant_tasks/ant-dklib/lib/test/testtemplate.jar"/>
 	<classpathentry kind="output" path="ant_tasks/ant-dklib/classes"/>
 </classpath>
