@@ -7,6 +7,7 @@ import org.apache.tools.ant.Task;
  * <pre>
  * Ant ファイルローテーション タスク<br/>
  * Antから指定のディレクトリに存在する一定の日数を越えて存在しているファイルを削除します。<br/>
+ * ファイルは指定の名前を含む名称のもののみ削除対象とします。<br/>
  * ファイルの日数はファイル自身の最終更新日付を元に判定されます。<br/>
  * 
  * <h4>パラメータ</h4>
@@ -71,10 +72,13 @@ import org.apache.tools.ant.Task;
 public class FileRotation  extends Task {
 	
 	/** ディレクトリ */
-	private java.io.File dir;
+	protected java.io.File dir;
+	
+	/** ファイル名 */
+	protected String filename;
 	
 	/**
-	 * ログローテーション対象のディレクトリを設定する。<p/>
+	 * ファイルローテーション対象のディレクトリを設定する。<p/>
 	 * 指定のパスが存在しない、またはパスがディレクトリをさしていなかった場合、例外を送出する。
 	 * 
 	 * @param dir ローテーション対象ディレクトリ
@@ -91,8 +95,18 @@ public class FileRotation  extends Task {
 			StringBuilder sb = new StringBuilder("dir is not directory.[").append(dir).append("]");
 			throw new BuildException(sb.toString());
 		}
-		
 	}
 	
+	/**
+	 * ファイルローテーション対象のファイル名を設定する。<p/>
+	 * 指定のパスが存在しない、またはパスがディレクトリをさしていなかった場合、例外を送出する。
+	 * 
+	 * @param dir ローテーション対象ディレクトリ
+	 * @throws BuildException パスが不正な場合
+	 */
+	public void setFileName(String filename) {
+		if (filename == null || filename.equals("")) throw new BuildException("filename is not set.");
+		this.filename = filename;
+	}
 	
 }

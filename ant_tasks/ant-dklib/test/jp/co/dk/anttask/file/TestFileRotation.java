@@ -15,13 +15,17 @@ public class TestFileRotation extends TestCaseTemplate {
 		try {
 			fileRotation.setDir(null);
 			fail();
-		} catch(BuildException e) {}
+		} catch(BuildException e) {
+			assertEquals(e.getMessage(), "target dir is not set.");
+		}
 		
 		// 空文字が設定された場合、例外が送出されること
 		try {
 			fileRotation.setDir("");
 			fail();
-		} catch(BuildException e) {}
+		} catch(BuildException e) {
+			assertEquals(e.getMessage(), "target dir is not set.");
+		}
 		
 		// 存在しないパスが設定された場合、例外が送出されること
 		try {
@@ -37,6 +41,41 @@ public class TestFileRotation extends TestCaseTemplate {
 			fail();
 		} catch(BuildException e) {
 			assertEquals(e.getMessage(), "dir is not directory.[" + super.getTestTmpFile().getAbsolutePath() + "]");
+		}
+		
+		// 存在するディレクトリへのパスが設定された場合、正常に値が設定できること
+		try {
+			fileRotation.setDir(super.getTestTmpDir().getAbsolutePath());
+			assertNotNull(fileRotation.dir);
+		} catch(BuildException e) {
+			fail(e);
+		}
+	}
+	
+	@Test
+	public void setFileName() {
+		FileRotation fileRotation = new FileRotation();
+		
+		// nullが設定された場合、例外が送出されること。
+		try {
+			fileRotation.setFileName(null);
+		} catch(BuildException e) {
+			assertEquals(e.getMessage(), "filename is not set.");
+		}
+		
+		// 空文字が設定された場合、例外が送出されること。
+		try {
+			fileRotation.setFileName("");
+		} catch(BuildException e) {
+			assertEquals(e.getMessage(), "filename is not set.");
+		}
+		
+		// 空文字以外が設定された場合、正常に値が保持されること
+		try {
+			fileRotation.setFileName("test");
+			assertEquals(fileRotation.filename, "test");
+		} catch(BuildException e) {
+			fail(e);
 		}
 	}
 
