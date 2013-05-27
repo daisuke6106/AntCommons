@@ -1,5 +1,7 @@
 package jp.co.dk.anttask.file;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.tools.ant.BuildException;
@@ -138,14 +140,38 @@ public class FileRotation  extends Task {
 		if (this.day < 0) throw new BuildException("day is not set.");
 		java.io.File[] fileList = this.dir.listFiles();
 		if (fileList == null || fileList.length == 0) return;
+		
+		String boforeDate = getStringByDate_YYYYMMDD(getBeforeDate(new Date(), this.day));
 		for (java.io.File file : fileList) {
 			if (file.getName().indexOf(this.filename) != -1) {
-				file.lastModified();
+				String fileDate = getStringByDate_YYYYMMDD(new Date(file.lastModified()));
+				if (fileDate.compareTo(boforeDate)<=0) {
+					file.delete();
+				}
 			}
 		}
 	}
 	
-	private Date calculationDate(Date date, int dayCount) {
-		return null;
+	/**
+	 * 指定の日付インスタンスから指定の日数を引いた日付インスタンスを返却する。
+	 * 
+	 * @param date 計算対象日付インスタンス
+	 * @param dayCount 日数
+	 * @return 計算結果日付インスタンス
+	 */
+	protected Date getBeforeDate(Date date, int dayCount) {
+		long mday = (1000L * 60L * 60L * 24L) * (long)dayCount;
+		long time = date.getTime();
+		return new Date(time - mday);
+	}
+	
+	/**
+	 * 指定の日付インスタンスをYYYYMMDD形式の文字列に変換し、返却します。
+	 * @param date 日付インスタンス
+	 * @return YYYMMDD形式の文字列
+	 */
+	protected String getStringByDate_YYYYMMDD(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		return sdf.format(date).toString();
 	}
 }

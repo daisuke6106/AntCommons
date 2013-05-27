@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <antlib>
+	<taskdef name="filerotation" classname="jp.co.dk.anttask.file.FileRotation"/>
 	<taskdef name="fileexist" classname="jp.co.dk.anttask.file.FileExist"/>
 	<taskdef name="forfile" classname="jp.co.dk.anttask.file.ForFile"/>
     <taskdef name="ipmsg" classname="jp.co.dk.anttask.ipmsg.IpMessenger"/>
