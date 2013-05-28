@@ -1,7 +1,6 @@
 package jp.co.dk.anttask.file;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.tools.ant.BuildException;
