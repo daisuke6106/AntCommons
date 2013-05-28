@@ -25,23 +25,24 @@
                 <property file="project/project.property"/>
             </ant>
 -->
-<project name="svn" basedir=".">
-    <!-- 共通タスク定義 -->
-    <import file="../../ant_tasks/taskdef.xml"/>
+<project name="ant_svn" basedir=".">
     
 	<script language="javascript">
 		<![CDATA[
 			importClass(java.io.File);
-			dir  = project.getProperty("ant.file.svn");
+			dir  = project.getProperty("ant.file.ant_svn");
 			file = new File(dir);
 			path = file.getParent();
-			project.setProperty("ant_svn.xml.dir", path);
+			project.setProperty("ant_svn.home", path);
 		]]>
 	</script>
 	
+	<!-- 共通タスク定義 -->
+    <import file="../../ant_tasks/taskdef.xml"/>
+    
     <!-- SVNモジュールの読み込み -->
     <path id="svnant.class.path">
-        <fileset dir="${ant_svn.xml.dir}/svnant-1.2.1/lib">
+        <fileset dir="${ant_svn.home}/svnant-1.2.1/lib">
             <include name="*.jar" />
         </fileset>
     </path>

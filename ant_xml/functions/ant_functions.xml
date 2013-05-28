@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ant_functions" basedir=".">
 	
+    <script language="javascript">
+		<![CDATA[
+			importClass(java.io.File);
+			dir  = project.getProperty("ant.file.ant_functions");
+			file = new File(dir);
+			path = file.getParent();
+			project.setProperty("ant_functions.home", path);
+		]]>
+	</script>
+	
 	<property name="all_function.target.spacer.start" value="[START]■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
 	<property name="all_function.target.spacer.fin"   value="[FIN]  ■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
 	

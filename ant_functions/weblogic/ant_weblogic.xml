@@ -28,8 +28,18 @@
             
   -->
 
-<project name="weblogic" >
+<project name="ant_weblogic" >
     
+    <script language="javascript">
+		<![CDATA[
+			importClass(java.io.File);
+			dir  = project.getProperty("ant.file.ant_weblogic");
+			file = new File(dir);
+			path = file.getParent();
+			project.setProperty("ant_weblogic.home", path);
+		]]>
+	</script>
+	
     <property name="weblogic.target.spacer.start" value="[START]----------------------------------------------------------------------------------------------------------"/>
     <property name="weblogic.target.spacer.fin"   value="[FIN]  ----------------------------------------------------------------------------------------------------------"/>
     

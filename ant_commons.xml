@@ -1,32 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
-	<property name="commmon_project.target.spacer.start" value="[START]=========================================================================================================="/>
-	<property name="commmon_project.target.spacer.fin"   value="[FIN]  =========================================================================================================="/>
+<project name="ant_commons">
+    
+  	<script language="javascript">
+		<![CDATA[
+			importClass(java.io.File);
+			dir  = project.getProperty("ant.file.ant_commons");
+			file = new File(dir);
+			path = file.getParent();
+			project.setProperty("ant_commons.home", path);
+		]]>
+	</script>
 	
-	<import file="../../ant_tasks/taskdef.xml"/>
+	<property name="ant_commons.target.spacer.start" value="[START]=========================================================================================================="/>
+	<property name="ant_commons.target.spacer.fin"   value="[FIN]  =========================================================================================================="/>
 	
-	<!--================================================-->
-	<!-- 初期化 -->
-	  <!--================================================-->
-	  <target name="init">
-	  	<path id="_init.path.id">
-	  	  <fileset dir="${library.dir}" includes="*.jar"/>
+	<import file="./ant_tasks/taskdef.xml"/>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] 初期化処理
+		■■     
+		■■     [説明] 以下のプロパティに設定されているディレクトリからjarファイルを検索し、jar一覧をプロパティへ再設定します。
+		■■            
+		■■            ・library.dir     （通常のソースコードが使用するlibを含まれたdir）    → _library.jars
+		■■            ・test.library.dir（テスト用のソースコードが使用するlibを含まれたdir）→ _test.library.jars            
+		■■            
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="init">
+		<path id="_init.path.id">
+	  		<fileset dir="${library.dir}" includes="*.jar"/>
 	  	</path>
 	  	<path id="_init.path.id.test">
-	  	  <fileset dir="${library.dir}" includes="*.jar"/>
-	  	  <fileset dir="${test.library.dir}" includes="*.jar"/>
+	  		<fileset dir="${library.dir}" includes="*.jar"/>
+	  		<fileset dir="${test.library.dir}" includes="*.jar"/>
 	  	</path>
 	  	<pathconvert property="_library.jars" refid="_init.path.id"/>
 	  	<pathconvert property="_test.library.jars" refid="_init.path.id.test"/>
-	  </target>
+	</target>
 	  
-	<!--================================================-->
-	  <!-- コンパイル -->
-	  <!--================================================-->
-	  <target name="compile" depends="init">
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] ソースコードコンパイル
+		■■     
+		■■     [説明] ソースコードをコンパイルし、指定のビルドディレクトリへ保存します。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="compile" depends="init">
 	  	<delete dir="${compile.delete.dir}" />
 	  	<mkdir dir="${compile.mkdir.dir}" />
-	    <javac srcdir      = "${compile.javac.srcdir}"
+	  	<javac srcdir      = "${compile.javac.srcdir}"
 	           destdir     = "${compile.javac.destdir}"
 	           deprecation = "${compile.javac.deprecation}"
 	           debug       = "${compile.javac.debug}"
@@ -34,20 +60,26 @@
 	           classpath   = "${compile.javac.classpath};${_library.jars}"
 	           includeantruntime="false"/>
 	  	<copy todir="${compile.copy.todir}">
-	  	  <fileset dir="${compile.copy.fileset.dir}">
+	  		<fileset dir="${compile.copy.fileset.dir}">
 	  	  	<include name="${compile.copy.fileset.include.name}"/>
-	  	    <exclude name="${compile.copy.fileset.exclude.name}"/>
-	   	  </fileset>
+	  	  	<exclude name="${compile.copy.fileset.exclude.name}"/>
+	   		</fileset>
 	   	</copy>
-	  </target>
+	</target>
 
-	 <!--================================================-->
-	  <!-- テスト用クラスコンパイル -->
-	  <!--================================================-->
-	  <target name="test_compile" depends="init">
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] テスト用ソースコードコンパイル
+		■■     
+		■■     [説明] テスト用ソースコードをコンパイルし、指定のビルドディレクトリへ保存します。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="test_compile" depends="init">
 	  	<delete dir="${test_compile.delete.dir}" />
 	  	<mkdir dir="${test_compile.mkdir.dir}" />
-	    <javac srcdir      = "${test_compile.javac.srcdir}"
+	  	<javac srcdir      = "${test_compile.javac.srcdir}"
 	           destdir     = "${test_compile.javac.destdir}"
 	           deprecation = "${test_compile.javac.deprecation}"
 	           debug       = "${test_compile.javac.debug}"
@@ -57,42 +89,60 @@
 	           />
 	  	<copy todir="${test_compile.copy.todir}">
 	  		<fileset dir="${test_compile.copy.fileset.dir}">
-	  		  <include name="${test_compile.copy.fileset.include.name}"/>
-	  		  <exclude name="${test_compile.copy.fileset.exclude.name}"/>
+	  			<include name="${test_compile.copy.fileset.include.name}"/>
+	  			<exclude name="${test_compile.copy.fileset.exclude.name}"/>
 	  		</fileset>
 	  	</copy>
-	  </target>
+	</target>
 	
-	 <!--================================================-->
-	  <!-- JARを作成 -->
-	  <!--================================================-->
-	  <target name="jar" depends="compile">
-	  	<delete dir="${jar.delete.dir}" />
-	  	<jar jarfile  = "${jar.jar.jarfile}"
-	         basedir  = "${jar.jar.basedir}" >
-	  		<zipgroupfileset dir="${library.dir}" includes="*.jar"/>
-	  	</jar>
-	  </target>
-	  
-	  <!--================================================-->
-	  <!-- テスト用JARを作成 -->
-	  <!--================================================-->
-	  <target name="test_jar" depends="test_compile">
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] JAR作成
+		■■     
+		■■     [説明] ビルド済みのクラスをJar形式でまとめます。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="jar" depends="compile">
+  	<delete dir="${jar.delete.dir}" />
+  	<jar jarfile  = "${jar.jar.jarfile}"
+         basedir  = "${jar.jar.basedir}" >
+  		<zipgroupfileset dir="${library.dir}" includes="*.jar"/>
+  	</jar>
+	</target>
+  
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] テスト用JAR作成
+		■■     
+		■■     [説明] ビルド済みのテスト用クラスをJar形式でまとめます。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="test_jar" depends="test_compile">
 	  	<delete dir="${test_jar.delete.dir}" />
 	  	<jar jarfile  = "${test_jar.jar.jarfile}"
 	         basedir  = "${test_jar.jar.basedir}" >
 	  		<zipgroupfileset dir="${library.dir}" includes="*.jar"/>
 	  		<zipgroupfileset dir="${test.library.dir}" includes="*.jar"/>
 	  	</jar>
-	  </target>
-	  
-	  <!--================================================-->
-	  <!-- javadocを生成 -->
-	  <!--================================================-->
-	  <target name="doc" depends="init">
+	</target>
+  
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] Javadoc生成
+		■■     
+		■■     [説明] 指定のJavaのソースコードからJavadocを生成し、指定の出力先に出力します。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="doc" depends="init">
 	  	<delete dir="${doc.delete.dir}"/>
-	    <mkdir  dir="${doc.mkdir.dir}" />
-	    <javadoc locale       = "${doc.jacadoc.locale}"
+	  	<mkdir  dir="${doc.mkdir.dir}" />
+	  	<javadoc locale       = "${doc.jacadoc.locale}"
 	             charset      = "${doc.jacadoc.charset}"
 	             encoding     = "${doc.jacadoc.encoding}"
 	             docencoding  = "${doc.jacadoc.docencoding}"
@@ -103,13 +153,19 @@
 	    		<pathelement path="${_library.jars}"/>
 	    		<pathelement path="${_test.library.jars}"/>
 	    	</classpath>
-	    </javadoc>
-	  </target>
+	  	</javadoc>
+	</target>
 
-	  <!--================================================-->
-	  <!-- FindBugs実行 -->
-	  <!--================================================-->
-	  <target name="findbugs.execute" depends="init">
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] FindBugs実行
+		■■     
+		■■     [説明] 指定のソースに対してFindBugsを実行します。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="findbugs.execute" depends="init">
 	  	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${_library.jars}"/>
 	  	<findbugs home="${_test.library.jars}" output="xml" outputFile="bcel-fb.xml">
 	  		<auxClassPath path="${_test.library.jars}"/>
@@ -117,36 +173,57 @@
 	  		<class location="./message.jar"/>
 	  		<class location="${_test.library.jars}"/>
 	  	</findbugs>
-	  </target>
-	  
-	  <!--================================================-->
-	  <!-- カバレッジ出力 -->
-	  <!--================================================-->
-	  <target name="coverege.execute">
-	    
-	  </target>
-	  
-	  <!--================================================-->
-	  <!-- ビルド用フォルダを削除 -->
-	  <!--================================================-->
-	  <target name="clean" depends="init">
-	    <delete dir="${clean.delete.dir}" />
-	  </target>
+	</target>
+  
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] カバレッジ取得
+		■■     
+		■■     [説明] JUNITのテストコードからカバレッジを生成する。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="coverege.execute">
+    
+	</target>
+  
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] ビルド用ディレクトリ削除
+		■■     
+		■■     [説明] ビルド用に作成したディレクトリとその中に含まれるビルドファイルを削除する
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="clean" depends="init">
+  		<delete dir="${clean.delete.dir}" />
+	</target>
 
-	  <!--================================================-->
-	  <!-- テストを実行 -->
-	  <!--================================================-->
-	  <target name="test_execute" depends="init">
-	  	<junit fork="${test_execute.junit.fork}" haltonfailure="${test_execute.junit.haltonfailure}">
-		    <test name="jp.co.dk.message.test.TestCaseMessage" />
-	        <formatter type="plain" usefile="false" />
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] テストを実行
+		■■     
+		■■     [説明] JUNITテストコードを検索し、逐次テストを実行する。
+		■■            テストが失敗した場合、その時点で<fail/>を発生し、処理は終了する。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="test_execute" depends="init">
+	    <!-- 
+  		<junit fork="${test_execute.junit.fork}" haltonfailure="${test_execute.junit.haltonfailure}">
+		  	<test name="jp.co.dk.message.test.TestCaseMessage" />
+	      	<formatter type="plain" usefile="false" />
 		  	<classpath>
-		  	  <pathelement path="${_test.library.jars}" />
-		  	  <pathelement path="${test_execute.junit.classpath.pathelement.location.test_jar}" />
-		  	  <pathelement path="${test_execute.junit.classpath.pathelement.location.jar}" />
-	        </classpath>
-		  </junit>
-	  </target>
+		  		<pathelement path="${_test.library.jars}" />
+		  		<pathelement path="${test_execute.junit.classpath.pathelement.location.test_jar}" />
+		  		<pathelement path="${test_execute.junit.classpath.pathelement.location.jar}" />
+	      	</classpath>
+		</junit>
+		 -->
+	</target>
 	
 	<!-- 
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -159,13 +236,13 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="check_update">
-		<echo message="${commmon_project.target.spacer.start}"/>
-		<ant dir="${ant_function.svn.home}" antfile="${ant_function.svn.file}" target="checkupdate" inheritAll="false">
+		<echo message="${ant_commons.target.spacer.start}"/>
+		<ant dir="./ant_functions/svn" antfile="ant_svn.xml" target="checkupdate" inheritAll="false">
 			<property name="svn.userid"           value="${svn.userid}"/>
 			<property name="svn.password"         value="${svn.password}"/>
 			<property name="svn.checkupdate.path" value="${project.home}"/>
 		</ant>
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -178,15 +255,15 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="svn_checkout">
-		<echo message="${commmon_project.target.spacer.start}"/>
-		<ant dir="${ant_function.svn.home}" antfile="${ant_function.svn.file}" target="checkout" inheritAll="false">
+		<echo message="${ant_commons.target.spacer.start}"/>
+		<ant dir="./ant_functions/svn" antfile="ant_svn.xml" target="checkout" inheritAll="false">
 			<property name="svn.userid"            value="${svn.userid}"/>
 			<property name="svn.password"          value="${svn.password}"/>
 			<property name="svn.checkout.url"      value="${svn.url}"/>
 			<property name="svn.checkout.destpath" value="${project.home}"/>
 			<property name="svn.checkout.revision" value="${svn.revision}"/>
 		</ant>
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -199,14 +276,14 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="svn_update">
-		<echo message="${commmon_project.target.spacer.start}"/>
-		<ant dir="${ant_function.svn.home}" antfile="${ant_function.svn.file}" target="update" inheritAll="false">
+		<echo message="${ant_commons.target.spacer.start}"/>
+		<ant dir="./ant_functions/svn" antfile="ant_svn.xml" target="update" inheritAll="false">
 			<property name="svn.userid"           value="${svn.userid}"/>
 			<property name="svn.password"         value="${svn.password}"/>
 			<property name="svn.update.dir"       value="${project.home}"/>
 			<property name="svn.update.revision"  value="${svn.revision}"/>
 		</ant>
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -220,9 +297,9 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="clean_build">
-		<echo message="${commmon_project.target.spacer.start}"/>
+		<echo message="${ant_commons.target.spacer.start}"/>
 		<echo message="[clean_build] プロジェクト=${project.name} クリーンビルドは定義されていません。"/>
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -236,9 +313,9 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="annotation_build">
-		<echo message="${commmon_project.target.spacer.start}"/>
+		<echo message="${ant_commons.target.spacer.start}"/>
 		<echo message="[annotation_build] プロジェクト=${project.name} アノテーションビルドは定義されていません。"/>
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -252,9 +329,9 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="build">
-		<echo message="${commmon_project.target.spacer.start}"/>
+		<echo message="${ant_commons.target.spacer.start}"/>
 		<echo message="[build] プロジェクト=${project.name} ビルドは定義されていません。"/>
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -267,7 +344,7 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="copy_application"> 
-		<echo message="${commmon_project.target.spacer.start}"/>
+		<echo message="${ant_commons.target.spacer.start}"/>
 		<!-- すでにあった場合、削除 --> 
 		<fileexist type="d" file="${project.release.path.to}/${project.relese.prefix.new}"> 
 			<true> 
@@ -277,7 +354,7 @@
 		<copy todir="${project.release.path.to}/${project.relese.prefix.new}"> 
 			<fileset dir="${project.release.path.from}"/> 
 		</copy> 
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -290,8 +367,8 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="undeploy">
-		<echo message="${commmon_project.target.spacer.start}"/>
-		<ant dir="${ant_function.weblogic.home}" antfile="${ant_function.weblogic.file}" target="undeploy" inheritAll="false">
+		<echo message="${ant_commons.target.spacer.start}"/>
+		<ant dir="./ant_functions/weblogic" antfile="ant_functions.xml" target="undeploy" inheritAll="false">
 			<property name="weblogic.home"          value="${weblogic.home}"/>
 			<property name="weblogic.adminurl"      value="${weblogic.addless}"/>
 			<property name="weblogic.user"          value="${weblogic.user}"/>
@@ -299,7 +376,7 @@
 			<property name="weblogic.targets"       value="${weblogic.targetserver}"/>
 			<property name="weblogic.undeploy.name" value="${project.name}"/>
 		</ant>
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -312,8 +389,8 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="undeploy_local">
-		<echo message="${commmon_project.target.spacer.start}"/>
-		<ant dir="${ant_function.weblogic.home}" antfile="${ant_function.weblogic.file}" target="undeploy" inheritAll="false">
+		<echo message="${ant_commons.target.spacer.start}"/>
+		<ant dir="./ant_functions/weblogic" antfile="ant_functions.xml" target="undeploy" inheritAll="false">
 			<property name="weblogic.home"          value="${weblogic.home}"/>
 			<property name="weblogic.adminurl"      value="${weblogic.addless.local}"/>
 			<property name="weblogic.user"          value="${weblogic.user.local}"/>
@@ -321,7 +398,7 @@
 			<property name="weblogic.targets"       value="${weblogic.targetserver.local}"/>
 			<property name="weblogic.undeploy.name" value="${project.name}"/>
 		</ant>
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -334,7 +411,7 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="rename_application"> 
-		<echo message="${commmon_project.target.spacer.start}"/>
+		<echo message="${ant_commons.target.spacer.start}"/>
 		<!-- 旧アプリケーションをリネームする --> 
 		<!-- すでにあった場合、削除 --> 
 		<fileexist type="d" file="${project.release.path.to}/${project.relese.prefix.old}"> 
@@ -356,7 +433,7 @@
 		<move todir="${project.release.path.to}/${project.name}"> 
 			<fileset dir="${project.release.path.to}/${project.relese.prefix.new}"/> 
 		</move> 
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target> 
 	
 	<!-- 
@@ -369,8 +446,8 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="deploy"> 
-		<echo message="${commmon_project.target.spacer.start}"/>
-		<ant dir="${ant_function.weblogic.home}" antfile="${ant_function.weblogic.file}" target="deploy" inheritAll="false"> 
+		<echo message="${ant_commons.target.spacer.start}"/>
+		<ant dir="./ant_functions/weblogic" antfile="ant_functions.xml" target="deploy" inheritAll="false"> 
 			<property name="weblogic.home"          value="${weblogic.home}"/> 
 			<property name="weblogic.adminurl"      value="${weblogic.addless}"/> 
 			<property name="weblogic.user"          value="${weblogic.user}"/> 
@@ -379,7 +456,7 @@
 			<property name="weblogic.deploy.name"   value="${project.name}"/> 
 			<property name="weblogic.deploy.source" value="${project.release.path.to}/${project.name}"/> 
 		</ant> 
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target> 
 	<!-- 
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -391,8 +468,8 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="deploy_local">
-		<echo message="${commmon_project.target.spacer.start}"/>
-		<ant dir="${ant_function.weblogic.home}" antfile="${ant_function.weblogic.file}" target="deploy" inheritAll="false">
+		<echo message="${ant_commons.target.spacer.start}"/>
+		<ant dir="./ant_functions/weblogic" antfile="ant_functions.xml" target="deploy" inheritAll="false">
 			<property name="weblogic.home"          value="${weblogic.home}"/>
 			<property name="weblogic.adminurl"      value="${weblogic.addless.local}"/>
 			<property name="weblogic.user"          value="${weblogic.user.local}"/>
@@ -401,7 +478,7 @@
 			<property name="weblogic.deploy.name"   value="${project.name}"/>
 			<property name="weblogic.deploy.source" value="${project.deploy.path}"/>
 		</ant>
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -414,9 +491,9 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="delete_application">
-		<echo message="${commmon_project.target.spacer.start}"/>
+		<echo message="${ant_commons.target.spacer.start}"/>
 		<delete dir="${project.release.path.to}/${project.relese.prefix.old}"/>
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target>
 	
 	<!-- 
@@ -429,8 +506,8 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
 	--> 
 	<target name="redeploy_local"> 
-		<echo message="${commmon_project.target.spacer.start}"/>
-		<ant dir="${ant_function.weblogic.home}" antfile="${ant_function.weblogic.file}" target="redeploy" inheritAll="false"> 
+		<echo message="${ant_commons.target.spacer.start}"/>
+		<ant dir="./ant_functions/weblogic" antfile="ant_functions.xml" target="redeploy" inheritAll="false"> 
 			<property name="weblogic.home"          value="${weblogic.home}"/> 
 			<property name="weblogic.adminurl"      value="${weblogic.addless.local}"/> 
 			<property name="weblogic.user"          value="${weblogic.user.local}"/> 
@@ -438,6 +515,6 @@
 			<property name="weblogic.targets"       value="${weblogic.targetserver.local}"/> 
 			<property name="weblogic.redeploy.name" value="${project.name}"/> 
 		</ant> 
-		<echo message="${commmon_project.target.spacer.fin}"/>
+		<echo message="${ant_commons.target.spacer.fin}"/>
 	</target> 
 </project>

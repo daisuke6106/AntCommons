@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir=".">
+<project name="all_project" basedir=".">
+	
+    <script language="javascript">
+		<![CDATA[
+			importClass(java.io.File);
+			dir  = project.getProperty("ant.file.all_project");
+			file = new File(dir);
+			path = file.getParent();
+			project.setProperty("all_project.home", path);
+		]]>
+	</script>
 	
 	<property name="all_project.target.spacer.start" value="[START]■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
 	<property name="all_project.target.spacer.fin"   value="[FIN]  ■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
