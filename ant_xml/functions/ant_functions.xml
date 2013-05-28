@@ -69,10 +69,10 @@
 			    <fail message="dump task is fail."/>
 			</catch>
 		</trycatch>
-		<!-- 
+		
 		<filerotation dir="${ant_functions.svn_dump.filerotation.dir}" filename="${ant_functions.svn_dump.filerotation.dir}"
 		              day="${ant_functions.svn_dump.filerotation.day}"/>
-		 -->
+		
 		<echo message="${all_function.target.spacer.fin}"/>
 	</target>
 </project>

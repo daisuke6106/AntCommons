@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ant_commons">
     
+	<tstamp>
+		<format property="date" pattern="yyyyMMdd" unit="hour"/>
+		<format property="time" pattern="HHmmss" unit="hour"/>
+ 	</tstamp>
+ 	
   	<script language="javascript">
 		<![CDATA[
 			importClass(java.io.File);
@@ -105,11 +110,28 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="jar" depends="compile">
-  	<delete dir="${jar.delete.dir}" />
-  	<jar jarfile  = "${jar.jar.jarfile}"
-         basedir  = "${jar.jar.basedir}" >
-  		<zipgroupfileset dir="${library.dir}" includes="*.jar"/>
-  	</jar>
+	  	<delete dir="${jar.delete.dir}" />
+	  	<jar jarfile  = "${jar.jar.jarfile}"
+	         basedir  = "${jar.jar.basedir}" >
+	  	</jar>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] JAR作成（lib含む）
+		■■     
+		■■     [説明] ビルド済みのクラスをJar形式でまとめます。
+		■■            作成されたJarにはビルドされたクラスファイルが依存しているすべてのjarが含まれます。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="jar_all" depends="compile">
+	  	<delete dir="${jar_all.delete.dir}" />
+	  	<jar jarfile  = "${jar_all.jar.jarfile}"
+	         basedir  = "${jar_all.jar.basedir}" >
+	  		<zipgroupfileset dir="${library.dir}" includes="*.jar"/>
+	  	</jar>
 	</target>
   
 	<!-- 
@@ -125,6 +147,23 @@
 	  	<delete dir="${test_jar.delete.dir}" />
 	  	<jar jarfile  = "${test_jar.jar.jarfile}"
 	         basedir  = "${test_jar.jar.basedir}" >
+	  	</jar>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] テスト用JAR作成（lib含む）
+		■■     
+		■■     [説明] ビルド済みのテスト用クラスをJar形式でまとめます。
+		■■            作成されたJarにはビルドされたテスト用クラスファイルが依存しているすべてのjarが含まれます。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="test_jar_all" depends="test_compile">
+	  	<delete dir="${test_jar_all.delete.dir}" />
+	  	<jar jarfile  = "${test_jar_all.jar.jarfile}"
+	         basedir  = "${test_jar_all.jar.basedir}" >
 	  		<zipgroupfileset dir="${library.dir}" includes="*.jar"/>
 	  		<zipgroupfileset dir="${test.library.dir}" includes="*.jar"/>
 	  	</jar>
