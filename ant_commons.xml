@@ -19,6 +19,7 @@
 	<property name="ant_commons.target.spacer.start" value="[START]=========================================================================================================="/>
 	<property name="ant_commons.target.spacer.fin"   value="[FIN]  =========================================================================================================="/>
 	
+	<!-- Ant拡張タスクの読み込み -->
 	<import file="./ant_tasks/taskdef.xml"/>
 	
 	<!-- 

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ant_functions" basedir=".">
 	
+    <!-- Ant共通タスクの読み込み -->
+	<import file="../../ant_commons.xml"/>
+	
     <script language="javascript">
 		<![CDATA[
 			importClass(java.io.File);
@@ -14,8 +17,6 @@
 	<property name="all_function.target.spacer.start" value="[START]■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
 	<property name="all_function.target.spacer.fin"   value="[FIN]  ■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■"/>
 	
-	<!-- Ant拡張タスクの読み込み -->
-	<import file="../../ant_tasks/taskdef.xml"/>
 	
 	<!-- ant関数 プロパティを読み込み -->
 	<property file="./ant_functions.properties"/> 
