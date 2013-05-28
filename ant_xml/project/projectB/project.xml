@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="project" basedir=".">
 	
-	<!-- Ant拡張タスクの読み込み -->
-	<import file="../../../ant_tasks/taskdef.xml"/>
+	<!-- Ant共通タスクの読み込み -->
+	<import file="../../ant_commons.xml"/>
 	
 	<!-- プロジェクトのプロパティを読込 -->
 	<property file="./project.properties"/>
-	
-	<!-- プロジェクト共通 -->
-	<import file="../common_project.xml"/>
 	
 </project>
