@@ -17,6 +17,13 @@
 		</classpath>
 	</taskdef>
 	
+	<!-- FindBugsのタスク定義 -->
+	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
+		<classpath>
+			<pathelement location="${taskdef.home}/findbugs-2.0.2/lib/findbugs-ant.jar"/>
+		</classpath>
+	</taskdef>
+
 	<!-- Ant-dklibのタスク定義 -->
 	<taskdef resource="jp/co/dk/anttask/antlib.xml">
 		<classpath>

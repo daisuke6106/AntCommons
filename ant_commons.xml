@@ -206,10 +206,9 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="findbugs.execute" depends="init">
-	  	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${_library.jars}"/>
-	  	<findbugs home="${_test.library.jars}" output="xml" outputFile="bcel-fb.xml">
-	  		<auxClassPath path="${_test.library.jars}"/>
-	  		<sourcePath path="scr"/>
+	  	<findbugs home="./ant_tasks/findbugs-2.0.2/" output="xml" outputFile="bcel-fb.xml">
+	  		<auxClassPath path="${_library.jars}"/>
+	  		<sourcePath path="findbugs_execute.findbugs.sourcepath"/>
 	  		<class location="./message.jar"/>
 	  		<class location="${_test.library.jars}"/>
 	  	</findbugs>
