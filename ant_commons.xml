@@ -195,7 +195,58 @@
 	    	</classpath>
 	  	</javadoc>
 	</target>
-
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] JavadocのJARを作成
+		■■     
+		■■     [説明] 指定のJavadocをJarにします。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="doc_jar" depends="init">
+	  	<delete dir="${doc_jar.delete.dir}" />
+	  	<jar jarfile  = "${doc_jar.jar.jarfile}"
+	         basedir  = "${doc_jar.jar.basedir}" >
+	    	<exclude name="**/.*"/>
+	  	</jar>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] ソースJAR作成
+		■■     
+		■■     [説明] ソースコードをJar形式でまとめます。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="src_jar" depends="init">
+	  	<delete dir="${src_jar.delete.dir}" />
+	  	<jar jarfile  = "${src_jar.jar.jarfile}"
+	         basedir  = "${src_jar.jar.basedir}" >
+	    	<exclude name="**/.*"/>
+	  	</jar>
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] テストソースJAR作成
+		■■     
+		■■     [説明] テストのソースコードをJar形式でまとめます。
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="test_src_jar" depends="init">
+	  	<delete dir="${test_src_jar.delete.dir}" />
+	  	<jar jarfile  = "${test_src_jar.jar.jarfile}"
+	         basedir  = "${test_src_jar.jar.basedir}" >
+	    	<exclude name="**/.*"/>
+	  	</jar>
+	</target>
+	
 	<!-- 
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 		■■     
@@ -205,10 +256,11 @@
 		■■     
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
-	<target name="findbugs.execute" depends="init">
-	  	<findbugs home="./ant_tasks/findbugs-2.0.2/" output="xml" outputFile="bcel-fb.xml">
-	  		<auxClassPath path="${_library.jars}"/>
-	  		<sourcePath path="findbugs_execute.findbugs.sourcepath"/>
+	<target name="findbugs_execute" depends="init">
+	  	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${_library.jars}"/>
+	  	<findbugs home="${_test.library.jars}" output="xml" outputFile="bcel-fb.xml">
+	  		<auxClassPath path="${_test.library.jars}"/>
+	  		<sourcePath path="scr"/>
 	  		<class location="./message.jar"/>
 	  		<class location="${_test.library.jars}"/>
 	  	</findbugs>
@@ -223,7 +275,7 @@
 		■■     
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
-	<target name="coverege.execute">
+	<target name="coverege_execute">
     
 	</target>
   
@@ -238,6 +290,19 @@
 	 -->
 	<target name="clean" depends="init">
   		<delete dir="${clean.delete.dir}" />
+	</target>
+	
+	<!-- 
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+		■■     
+		■■     [概要] ドキュメント用ディレクトリ削除
+		■■     
+		■■     [説明] ビルド用に作成したドキュメントディレクトリとその中に含まれるドキュメントファイルを削除する
+		■■     
+		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	 -->
+	<target name="clean_doc" depends="init">
+  		<delete dir="${clean_doc.delete.dir}" />
 	</target>
 
 	<!-- 
