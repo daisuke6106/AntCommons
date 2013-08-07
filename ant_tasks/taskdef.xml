@@ -20,10 +20,13 @@
 	<!-- FindBugsのタスク定義 -->
 	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
 		<classpath>
-			<pathelement location="${taskdef.home}/findbugs-2.0.2/lib/findbugs-ant.jar"/>
+			<pathelement location="${taskdef.home}/findbugs/findbugs-2.0.2/lib/findbugs-ant.jar"/>
 		</classpath>
 	</taskdef>
-
+	
+	<!-- CheckStyleのタスク定義 -->
+	<taskdef resource="checkstyletask.properties" classpath="${taskdef.home}/checkstyle/checkstyle-5.6/checkstyle-5.6-all.jar"/>
+	
 	<!-- Ant-dklibのタスク定義 -->
 	<taskdef resource="jp/co/dk/anttask/antlib.xml">
 		<classpath>
