@@ -257,12 +257,14 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="findbugs_execute" depends="init">
-	  	<!-- <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${_test.library.jars}"/> -->
 	  	<findbugs home="${findbugs_execute.findbugs.home}" output="${findbugs_execute.findbugs.output}" outputFile="${findbugs_execute.findbugs.outputfile}">
 	  		<auxClassPath path="${_test.library.jars}"/>
 	  		<sourcePath path="${findbugs_execute.findbugs.sourcepath.path}"/>
 	  		<class location="${findbugs_execute.findbugs.class.location}"/>
 	  	</findbugs>
+	  	<exec executable="${findbugs_execute.findbugs.home}/bin/findbugs">
+	  		<arg value="${findbugs_execute.findbugs.outputfile}"/>
+	  	</exec>
 	</target>
 
 	<!-- 
@@ -275,7 +277,6 @@
 		■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	 -->
 	<target name="checkstyle_execute" depends="init">
-		<!-- <taskdef resource="checkstyletask.properties" classpath="${checkstyle_execute.taskdefs.classpath}"/> -->
 		<checkstyle config="${checkstyle_execute.checkstyle.config}" failOnViolation="${checkstyle_execute.checkstyle.failOnViolation}">
 			<fileset dir="${checkstyle_execute.checkstyle.fileset.dir}" includes="${checkstyle_execute.checkstyle.fileset.includes}"/>
 			<formatter type="${checkstyle_execute.checkstyle.formatter.type}" toFile="${checkstyle_execute.checkstyle.formatter.tofile}"/>
