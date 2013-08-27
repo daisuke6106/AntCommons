@@ -649,10 +649,10 @@
 		<antcall target="doc_jar"/>
 		<antcall target="src_jar"/>
 		<antcall target="test_src_jar"/>
+		<antcall target="clean"/>
+		<antcall target="clean_doc"/>
 		<antcall target="test_execute"/>
 		<antcall target="findbugs_execute"/>
 		<antcall target="checkstyle_execute"/>
-		<antcall target="clean"/>
-		<antcall target="clean_doc"/>
 	</target>
 </project>
