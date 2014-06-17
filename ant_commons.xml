@@ -8,6 +8,7 @@
  	
   	<script language="javascript">
 		<![CDATA[
+			load("nashorn:mozilla_compat.js");
 			importClass(java.io.File);
 			dir  = project.getProperty("ant.file.ant_commons");
 			file = new File(dir);
@@ -15,6 +16,7 @@
 			project.setProperty("ant_commons.home", path);
 		]]>
 	</script>
+	
 	
 	<property name="ant_commons.target.spacer.start" value="[START]=========================================================================================================="/>
 	<property name="ant_commons.target.spacer.fin"   value="[FIN]  =========================================================================================================="/>
@@ -66,11 +68,14 @@
 	           classpath   = "${compile.javac.classpath};${_library.jars}"
 	           includeantruntime="false"/>
 	  	<copy todir="${compile.copy.todir}">
-	  		<fileset dir="${compile.copy.fileset.dir}">
+	  		<fileset dir="${compile.copy.fileset.dir.src}">
 	  	  	<include name="${compile.copy.fileset.include.name}"/>
 	  	  	<exclude name="${compile.copy.fileset.exclude.name}"/>
 	   		</fileset>
 	   	</copy>
+		<copy todir="${compile.copy.todir}">
+			<fileset dir="${compile.copy.fileset.dir.resources}"/>
+		</copy>
 	</target>
 
 	<!-- 
@@ -94,11 +99,14 @@
 	           includeantruntime="false"
 	           />
 	  	<copy todir="${test_compile.copy.todir}">
-	  		<fileset dir="${test_compile.copy.fileset.dir}">
+	  		<fileset dir="${test_compile.copy.fileset.dir.src}">
 	  			<include name="${test_compile.copy.fileset.include.name}"/>
 	  			<exclude name="${test_compile.copy.fileset.exclude.name}"/>
 	  		</fileset>
 	  	</copy>
+		<copy todir="${test_compile.copy.todir}">
+			<fileset dir="${test_compile.copy.fileset.dir.resources}"/>
+		</copy>
 	</target>
 	
 	<!-- 
