@@ -2,6 +2,7 @@
 <project name="taskdef">
 	<script language="javascript">
 		<![CDATA[
+			load("nashorn:mozilla_compat.js");
 			importClass(java.io.File);
 			dir  = project.getProperty("ant.file.taskdef");
 			file = new File(dir);

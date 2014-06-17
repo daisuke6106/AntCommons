@@ -8,6 +8,7 @@
  	
   	<script language="javascript">
 		<![CDATA[
+			load("nashorn:mozilla_compat.js");
 			importClass(java.io.File);
 			dir  = project.getProperty("ant.file.ant_commons");
 			file = new File(dir);
@@ -15,6 +16,7 @@
 			project.setProperty("ant_commons.home", path);
 		]]>
 	</script>
+	
 	
 	<property name="ant_commons.target.spacer.start" value="[START]=========================================================================================================="/>
 	<property name="ant_commons.target.spacer.fin"   value="[FIN]  =========================================================================================================="/>
