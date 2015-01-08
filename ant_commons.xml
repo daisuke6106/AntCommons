@@ -346,9 +346,9 @@
 		  	<test name="${test_execute.junit.test.name}" />
 	      	<formatter type="plain" usefile="false" />
 		  	<classpath>
-		  		<pathelement path="${_test.library.jars}" />
 		  		<pathelement path="${test_execute.junit.classpath.pathelement.location.test_jar}" />
 		  		<pathelement path="${test_execute.junit.classpath.pathelement.location.jar}" />
+		  		<pathelement path="${_test.library.jars}" />
 	      	</classpath>
 		</junit>
 	</target>
@@ -655,11 +655,11 @@
 		<antcall target="jar_all"/>
 		<antcall target="test_jar_all"/>
 		<antcall target="doc"/>
-		<antcall target="doc_jar"/>
+		<!-- <antcall target="doc_jar"/> -->
 		<antcall target="src_jar"/>
 		<antcall target="test_src_jar"/>
 		<antcall target="clean"/>
-		<antcall target="clean_doc"/>
+		<!-- <antcall target="clean_doc"/> -->
 		<antcall target="test_execute"/>
 		<antcall target="findbugs_execute"/>
 		<antcall target="checkstyle_execute"/>
