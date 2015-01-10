@@ -346,6 +346,8 @@
 		  	<test name="${test_execute.junit.test.name}" />
 	      	<formatter type="plain" usefile="false" />
 		  	<classpath>
+		  		<pathelement path="${test_execute.junit.classpath.pathelement.location.test_properties}" />
+		  		<pathelement path="${test_execute.junit.classpath.pathelement.location.test_message}" />
 		  		<pathelement path="${test_execute.junit.classpath.pathelement.location.test_jar}" />
 		  		<pathelement path="${test_execute.junit.classpath.pathelement.location.jar}" />
 		  		<pathelement path="${_test.library.jars}" />
