@@ -343,6 +343,7 @@
 	 -->
 	<target name="test_execute" depends="init">
   		<junit fork="${test_execute.junit.fork}" haltonfailure="${test_execute.junit.haltonfailure}">
+  			<jvmarg value="${test_execute.jvmarg.value}"/>
 		  	<test name="${test_execute.junit.test.name}" />
 	      	<formatter type="plain" usefile="false" />
 		  	<classpath>
