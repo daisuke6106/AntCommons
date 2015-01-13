@@ -1,2 +1,3 @@
 # 指定のjarライブラリを全プロジェクトへ配布する
+find ./ -name testtemplate_all.jar -ls
 for i in `find ./ -name testtemplate_all.jar`; do cp -p ./TestTemplate/testtemplate_all.jar $i; done 2>/dev/null 
