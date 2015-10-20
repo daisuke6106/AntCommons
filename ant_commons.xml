@@ -121,7 +121,7 @@
 	 -->
 	<target name="jar" depends="compile">
 	  	<delete dir="${jar.delete.dir}" />
-	  	<jar jarfile  = "${jar.jar.jarfile}_${project.version}"
+	  	<jar jarfile  = "${jar.jar.jarfile}"
 	         basedir  = "${jar.jar.basedir}" >
 	  	</jar>
 	</target>
@@ -138,7 +138,7 @@
 	 -->
 	<target name="jar_all" depends="compile">
 	  	<delete dir="${jar_all.delete.dir}" />
-	  	<jar jarfile  = "${jar_all.jar.jarfile}_${project.version}"
+	  	<jar jarfile  = "${jar_all.jar.jarfile}"
 	         basedir  = "${jar_all.jar.basedir}" >
 	  		<zipgroupfileset dir="${library.dir}" includes="*.jar"/>
 	  	</jar>
@@ -155,7 +155,7 @@
 	 -->
 	<target name="test_jar" depends="test_compile">
 	  	<delete dir="${test_jar.delete.dir}" />
-	  	<jar jarfile  = "${test_jar.jar.jarfile}_${project.version}"
+	  	<jar jarfile  = "${test_jar.jar.jarfile}"
 	         basedir  = "${test_jar.jar.basedir}" >
 	  	</jar>
 	</target>
@@ -172,7 +172,7 @@
 	 -->
 	<target name="test_jar_all" depends="test_compile">
 	  	<delete dir="${test_jar_all.delete.dir}" />
-	  	<jar jarfile  = "${test_jar_all.jar.jarfile}_${project.version}"
+	  	<jar jarfile  = "${test_jar_all.jar.jarfile}"
 	         basedir  = "${test_jar_all.jar.basedir}" >
 	  		<zipgroupfileset dir="${library.dir}" includes="*.jar"/>
 	  		<zipgroupfileset dir="${test.library.dir}" includes="*.jar"/>
@@ -216,7 +216,7 @@
 	 -->
 	<target name="doc_jar" depends="init">
 	  	<delete dir="${doc_jar.delete.dir}" />
-	  	<jar jarfile  = "${doc_jar.jar.jarfile}_${project.version}"
+	  	<jar jarfile  = "${doc_jar.jar.jarfile}"
 	         basedir  = "${doc_jar.jar.basedir}" >
 	    	<exclude name="**/.*"/>
 	  	</jar>
@@ -233,7 +233,7 @@
 	 -->
 	<target name="src_jar" depends="init">
 	  	<delete dir="${src_jar.delete.dir}" />
-	  	<jar jarfile  = "${src_jar.jar.jarfile}_${project.version}"
+	  	<jar jarfile  = "${src_jar.jar.jarfile}"
 	         basedir  = "${src_jar.jar.basedir}" >
 	    	<exclude name="**/.*"/>
 	  	</jar>
@@ -250,7 +250,7 @@
 	 -->
 	<target name="test_src_jar" depends="init">
 	  	<delete dir="${test_src_jar.delete.dir}" />
-	  	<jar jarfile  = "${test_src_jar.jar.jarfile}_${project.version}"
+	  	<jar jarfile  = "${test_src_jar.jar.jarfile}"
 	         basedir  = "${test_src_jar.jar.basedir}" >
 	    	<exclude name="**/.*"/>
 	  	</jar>
